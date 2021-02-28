@@ -23,7 +23,7 @@ Many of the commands below assume that you are in the directory containing the c
 1. Install dependencies
    - This can be done with `npm install`
 2. Build static assets
-   - This can be done with `npm run`
+   - This can be done with `npm run start`
 
 
 ## Usage
