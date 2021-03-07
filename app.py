@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 import login 
 
-@app.route('/')
+@app.route('/api/')
 def homepage():
     user = session.get('user')
     return render_template('home.html', user=user)

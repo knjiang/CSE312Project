@@ -15,21 +15,28 @@ oauth.register(
     }
 )
 
-@app.route('/login')
+@app.route('/api/login')
 def login():
     redirect_uri = url_for('auth', _external=True)
     return oauth.google.authorize_redirect(redirect_uri)
 
 
-@app.route('/auth')
+@app.route('/api/auth')
 def auth():
     token = oauth.google.authorize_access_token()
     user = oauth.google.parse_id_token(token)
     session['user'] = user
-    return redirect('/')
+    return redirect('/api/')
 
 
-@app.route('/logout')
+@app.route('/api/logout')
 def logout():
     session.pop('user', None)
-    return redirect('/')
+    return redirect('/api/')
+
+@app.route('/api/verify_login')
+def is_logged():
+    package = {'logged_in' : False}
+    if 'user' in session:
+        package['logged_in'] = True
+    return package
