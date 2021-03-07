@@ -2,8 +2,11 @@ import React, {useState,useEffect} from "react"
 import { Link } from "react-router-dom"
 
 function Home(){
-    const [logged_in,setLogged_In] = useState(false)
-
+    const [user,setUser] = useState({
+        logged_in : false,
+        user_name : 'Guest'
+    })
+     
     const login_button = <Link to="/login">
                              <button>
                                  Login
@@ -19,14 +22,13 @@ function Home(){
     useEffect(()=>{
         fetch("/api/verify_login")
             .then(response => response.json())
-            .then(data => setLogged_In(data.logged_in))
-        console.log(logged_in)
-    });
+            .then(data =>setUser(data))
+    },[]);
 
     return (
     <div id = "Homepage">
     <h1>
-        Hi, This is our current homepage   :)
+        Hi {user.user_name}, This is our current homepage   :)
     </h1>
 
     <p>
@@ -41,8 +43,8 @@ function Home(){
         </Link>
         <br/>
         <br/>
-        {logged_in && logout_button}
-        {!logged_in && login_button}
+        {user.logged_in && logout_button}
+        {!user.logged_in && login_button}
     </p>
     </div>
     );

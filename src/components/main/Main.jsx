@@ -1,5 +1,5 @@
 import React from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 
 import Home from '../../pages/Home';
 import Drawer from '../../pages/Drawer';
@@ -14,6 +14,7 @@ const Main = () => {
       <Route exact path='/drawer' component={Drawer}></Route>
       <Route exact path='/login' component={Login}></Route>
       <Route exact path='/logout' component={Logout}></Route>
+      <Redirect from='/api/' to='/'></Redirect>
     </Switch>
   );
 }

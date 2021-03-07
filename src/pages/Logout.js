@@ -7,6 +7,9 @@ const Logout = () => (
         Hi, This is our current logout page :)
     </h1>
 
+    <button>
+        Log out here! 
+    </button>
     
     </div>
 )
