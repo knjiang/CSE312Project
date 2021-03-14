@@ -3,7 +3,7 @@ import os
 from app import *
 
 app.config.from_object('config')
-app.secret_key = os.urandom(24)
+app.secret_key = 'verysecret'
 
 CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
 oauth = OAuth(app)
