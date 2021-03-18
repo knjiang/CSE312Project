@@ -1,5 +1,7 @@
 import React from 'react';
 import Board from '../board/Board'
+import Chat from '../chat/Chat'
+import Players from '../players/Players';
 
 import './style.css'
 
@@ -10,16 +12,23 @@ class Container extends React.Component {
 
     }
 
+
     render() {
         return(
             <div className = "container">
-                <div className = "color-picker">
-                    <input type = "color" />
+
+                <div >
+                    <Players/>
                 </div>
 
-                <div className = "board-container">
-                    <Board></Board>
+                <div >
+                    <Board />
                 </div>
+
+                <div >
+                    <Chat />
+                </div>
+
             </div>
         )
     }

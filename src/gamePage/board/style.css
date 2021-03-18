@@ -1,0 +1,36 @@
+.board {
+    width: 45vw;
+    height: 60vh;
+    border: 2px solid red;
+    background-color: white;
+}
+
+
+.sizeContainer {
+    border: 2px solid yellow;
+    margin: auto;
+    text-align: center;
+}
+
+.colorContainer {
+    border: 2px solid blue;
+    margin: auto;
+    text-align: center;
+}
+
+.options {
+    margin: auto;
+    border: 2px solid red;
+    text-align: center;
+    
+    display: inline-block;
+}
+
+
+.boardContainer {
+    text-align: center;
+    margin-top: 20vh;
+    display: inline-block;
+    width: 50vw;
+    height: 78vh;
+}

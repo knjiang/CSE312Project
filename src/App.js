@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import Container from './components/container/Container';
+import Container from './gamePage/container/Container';
 
 function App() {
   return (
