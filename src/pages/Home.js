@@ -3,6 +3,8 @@ import { Link } from "react-router-dom"
 
 import io from "socket.io-client"
 
+import LobbyList from "../components/LobbyList"
+
 function Home(){
     const [user,setUser] = useState({
         logged_in : false,
@@ -15,14 +17,15 @@ function Home(){
 
     const getUsers = () => {
         socket.on("logged", msg => {
-            console.log(msg);
             setOnline(msg);
         })
     }
-    const refreshLobby = () =>{
-        socket.emit("logged", user)
+    const logging_user = (data) => {
+        setUser(data);
+        console.log('hi and me')
+        socket.emit("logged", data)
+        console.log('gottem',data)
     }
-
     const login_button = <Link to="/login">
                              <button>
                                  Login
@@ -38,15 +41,17 @@ function Home(){
     useEffect(()=>{
         fetch("/api/verify_login")
             .then(response => response.json())
-            .then(data =>setUser(data));
-        console.log(online)
-        getUsers();
+            .then(data =>logging_user(data))
+        fetch("/api/online_users")
+            .then(response => response.json())
+            .then(data => setOnline(data.members));
+        getUsers(); 
     },[]);
 
     return (
     <div id = "Homepage">
     <h1>
-        Hi {user.user_name}, This is our current homepage   :)
+        Hi {user.user_name} and {user.user_email}, This is our current homepage   :)
     </h1>
 
     <p>
@@ -63,10 +68,8 @@ function Home(){
         <br/>
         {user.logged_in && logout_button}
         {!user.logged_in && login_button}
-        {online}
-        <button onClick= {() => refreshLobby()}>
-            Refresh Lobby 
-        </button>
+        <LobbyList users = {online}>
+        </LobbyList>
     </p>
     </div>
     );

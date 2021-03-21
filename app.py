@@ -17,13 +17,16 @@ def homepage():
 
 @socketIo.on("logged")
 def handleLogin(info):
-    if info['logged_in']:
-        print(info)
+    if info['logged_in'] and info['user_email'] not in lobby_manager.emails:
+        print('went here', info)
         lobby_manager.add(info['user_name'],info['user_email'])
-        print(lobby_manager.members)
         emit('logged',lobby_manager.members,broadcast=True)
     return None 
     
-
+@app.route('/api/online_users')
+def is_online():
+    package = { 'members' : lobby_manager.members }
+    return package 
+    
 if __name__ == "__main__":
     socketIo.run(app)
