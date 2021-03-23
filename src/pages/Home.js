@@ -23,8 +23,17 @@ function Home(){
     const logging_user = (data) => {
         setUser(data);
         console.log('hi and me')
+        data['add'] = true 
         socket.emit("logged", data)
         console.log('gottem',data)
+    }
+
+    const delete_user = () => {
+        var data = {...user}
+        data['add'] = false 
+        console.log(data)
+        socket.emit("logged", data)
+        console.log('finished emitting')
     }
     const login_button = <Link to="/login">
                              <button>
@@ -33,7 +42,7 @@ function Home(){
                          </Link>
     
     const logout_button = <Link to="/logout">
-                            <button>
+                            <button onClick = {delete_user}>
                                 Logout
                             </button>
                           </Link>
@@ -68,9 +77,9 @@ function Home(){
         <br/>
         {user.logged_in && logout_button}
         {!user.logged_in && login_button}
-        <LobbyList users = {online}>
-        </LobbyList>
     </p>
+    <LobbyList users = {online}>
+    </LobbyList>
     </div>
     );
 }

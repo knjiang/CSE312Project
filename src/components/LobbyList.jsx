@@ -2,7 +2,7 @@ import React from 'react';
 
 function LobbyList(props){
     const listUsers = props.users.map((user) =>
-        <li>{user}</li>
+        <li key ="{user}">{user}</li>
     );
     return (
         <div>
