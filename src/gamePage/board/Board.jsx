@@ -1,11 +1,25 @@
 import React from 'react';
 import './style.css';
 import { TwitterPicker } from 'react-color';
+import { io } from 'socket.io-client';
 
 class Board extends React.Component {
 
+    timeout;
+    socket = io.connect("http://localhost:5000")
+
     constructor(props) {
         super(props);
+
+        this.socket.on("canvas-data", function(data){
+            var image = new Image();
+            var canvas = document.querySelector('#board');
+            var ctx = canvas.getContext('2d');
+            image.onload = function() {
+                ctx.drawImage(image, 0, 0);
+            };
+            image.src = data;
+        })
 
         this.sizeChange = this.sizeChange.bind(this)
         this.colorChange = this.colorChange.bind(this)
@@ -69,12 +83,20 @@ class Board extends React.Component {
             canvas.removeEventListener('mousemove', onPaint, false);
         }, false);
 
+        var root = this;
+
         var onPaint = function() {
             ctx.beginPath();
             ctx.moveTo(last_mouse.x, last_mouse.y);
             ctx.lineTo(mouse.x, mouse.y);
             ctx.closePath();
             ctx.stroke();
+
+            if (root.timeout != undefined) clearTimeout(root.timeout);
+            root.timeout = setTimeout(function(){
+                var image = canvas.toDataURL("image/png");
+                root.socket.emit("canvas-data", image);
+            }, 500);
         };
     }
 

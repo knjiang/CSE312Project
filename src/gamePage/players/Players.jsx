@@ -13,7 +13,7 @@ class Players extends React.Component {
     render() {
         return(
             <div className = 'playersContainer'>
-                <h1>HI</h1>
+                <h1>Players</h1>
             </div>
         )
     }
