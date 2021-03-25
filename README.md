@@ -2,7 +2,7 @@
 
 ## Setting up
 
-- [Python 3](https://www.python.org/getit/) is required to to run the core server
+- [Python 3.7](https://www.python.org/getit/) is required to to run the core server
 - [Pipenv](https://pipenv.readthedocs.io/en/latest/install/) is used for managing Python dependency packages
 - [Node.js](https://nodejs.org/en/download/) and [NPM](https://www.npmjs.com/get-npm) are also needed for the front end.
 
@@ -30,3 +30,14 @@
 - Activate the virtual environment with `pipenv shell`
   - This should be done any time you open a new terminal for development
 - Deactivate the virtual environment with `deactivate`
+
+
+### Start Up
+
+- After activating python virtual environment, deploy the python server with the command `flask run` 
+- The front-end server can be started with the command `npm run start` 
+- The server can be found at `localhost:3000` 
+
+### Google OAuth Required
+
+- The login service requires Google OAuth credentials in order to be usable. Please create your own `.env` file and fill out `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` by using the steps in `Create authorization details` from https://developers.google.com/identity/sign-in/web/sign-in
