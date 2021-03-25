@@ -14,21 +14,21 @@ class Board extends React.Component {
         this.socket.on("canvas-data", function(data){
             var image = new Image();
             var canvas = document.querySelector('#board');
-            var ctx = canvas.getContext('2d');
+            var canvas_data = canvas.getContext('2d');
             image.onload = function() {
-                ctx.drawImage(image, 0, 0);
+                canvas_data.drawImage(image, 0, 0);
             };
             image.src = data;
         })
 
         this.sizeChange = this.sizeChange.bind(this)
         this.colorChange = this.colorChange.bind(this)
-        this.draw_on_canvas = this.draw_on_canvas.bind(this)
+        this.painter = this.painter.bind(this)
         this.saveImage = this.saveImage.bind(this)
     }
 
     componentDidMount() {
-        this.draw_on_canvas()
+        this.painter()
         sessionStorage.setItem('size', 5)
     }
 
@@ -48,21 +48,22 @@ class Board extends React.Component {
         window.open(canvas.toDataURL("image/png"));
     }
 
-    draw_on_canvas() {
+    painter() {
         var canvas = document.querySelector('#board');
-        var ctx = canvas.getContext('2d');
+        var canvas_data = canvas.getContext('2d');
         
-        var sketch_style = getComputedStyle(canvas);
-        canvas.width = parseInt(sketch_style.getPropertyValue('width'));
-        canvas.height = parseInt(sketch_style.getPropertyValue('height'));
+        var canvas_sizing = getComputedStyle(canvas);
+        canvas.width = parseInt(canvas_sizing.getPropertyValue('width'), 10);
+        canvas.height = parseInt(canvas_sizing.getPropertyValue('height'), 10);
 
         var mouse = {x: 0, y: 0};
         var last_mouse = {x: 0, y: 0};
 
-        /* Mouse Capturing Work */
         canvas.addEventListener('mousemove', function(e) {
-            ctx.lineWidth = sessionStorage.size;
-            ctx.strokeStyle = sessionStorage.getItem('color');
+            canvas_data.lineJoin = 'round';
+            canvas_data.lineCap = 'round';
+            canvas_data.lineWidth = sessionStorage.size;
+            canvas_data.strokeStyle = sessionStorage.getItem('color');
             last_mouse.x = mouse.x;
             last_mouse.y = mouse.y;
 
@@ -70,10 +71,21 @@ class Board extends React.Component {
             mouse.y = e.pageY - this.offsetTop;
         }, false);
 
+        var orginSocket = this;
 
-        /* Drawing on Paint App */
-        ctx.lineJoin = 'round';
-        ctx.lineCap = 'round';
+        function onPaint() {
+            canvas_data.beginPath();
+            canvas_data.moveTo(last_mouse.x, last_mouse.y);
+            canvas_data.lineTo(mouse.x, mouse.y);
+            canvas_data.closePath();
+            canvas_data.stroke();
+
+            if (orginSocket.timeout != undefined) clearTimeout(orginSocket.timeout);
+            orginSocket.timeout = setTimeout(function(){
+                var image = canvas.toDataURL("image/png");
+                orginSocket.socket.emit("canvas-data", image);
+            }, 500);
+        };
 
         canvas.addEventListener('mousedown', function(e) {
             canvas.addEventListener('mousemove', onPaint, false);
@@ -83,21 +95,7 @@ class Board extends React.Component {
             canvas.removeEventListener('mousemove', onPaint, false);
         }, false);
 
-        var root = this;
 
-        var onPaint = function() {
-            ctx.beginPath();
-            ctx.moveTo(last_mouse.x, last_mouse.y);
-            ctx.lineTo(mouse.x, mouse.y);
-            ctx.closePath();
-            ctx.stroke();
-
-            if (root.timeout != undefined) clearTimeout(root.timeout);
-            root.timeout = setTimeout(function(){
-                var image = canvas.toDataURL("image/png");
-                root.socket.emit("canvas-data", image);
-            }, 500);
-        };
     }
 
     render() {
