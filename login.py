@@ -3,7 +3,7 @@ import os
 from app import *
 
 app.config.from_object('config')
-app.secret_key = 'verysecret'
+app.secret_key = os.urandom(24)
 
 CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
 oauth = OAuth(app)
@@ -40,4 +40,5 @@ def is_logged():
     if 'user' in session:
         package['logged_in'] = True
         package['user_name'] = session['user']['given_name']
+        package['user_email'] = session['user']['email']
     return package
