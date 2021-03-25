@@ -4,10 +4,7 @@
 
 - [Python 3](https://www.python.org/getit/) is required to to run the core server
 - [Pipenv](https://pipenv.readthedocs.io/en/latest/install/) is used for managing Python dependency packages
-- [Node.js](https://nodejs.org/en/download/) and [Yarn](https://yarnpkg.com/en/docs/install) are also needed for building the static assets
-
-Of course, you also need to clone this repository to get started.
-Many of the commands below assume that you are in the directory containing the cloned repository.
+- [Node.js](https://nodejs.org/en/download/) and [NPM](https://www.npmjs.com/get-npm) are also needed for the front end.
 
 ### Python
 
