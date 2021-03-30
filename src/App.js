@@ -1,10 +1,9 @@
-import logo from './logo.svg';
 import './App.css';
-import Container from './gamePage/container/Container';
+import Main from './components/main/Main';
 
 function App() {
   return (
-    <Container/>
+    <Main/>
   );
 }
 
