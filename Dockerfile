@@ -1,20 +1,18 @@
-FROM python:3.8.5
+FROM node:13.12.0-alpine
 
-RUN pip install python-dotenv
-RUN pip install pipenv
+WORKDIR /app
 
-COPY . /app
+ENV PATH /app/node_modules/.bin:$PATH
 
-ENV HOME /app
+COPY package.json ./
+COPY package-lock.json ./
 
-WORKDIR ${HOME}
+RUN npm install
+RUN npm install react-scripts@3.4.1 -g --silent
 
-COPY Pipfile Pipfile.lock ${HOME}/
+COPY . ./
 
-RUN pipenv install --system --deploy
+EXPOSE 3000
 
-ENTRYPOINT [ "python" ]
-
-EXPOSE 8000
-
-CMD [ "app.py" ]
+# start app
+CMD ["npm", "start"]
