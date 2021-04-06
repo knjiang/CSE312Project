@@ -1,11 +1,11 @@
 import React, {useState,useEffect} from "react"
 import { Link } from "react-router-dom"
-
-import io from "socket.io-client"
+import {Socket as socket} from "../pages/Socket";
 
 import LobbyList from "../components/LobbyList"
 
 function Home(){
+    
     const [user,setUser] = useState({
         logged_in : false,
         user_name : 'Guest',
@@ -13,7 +13,6 @@ function Home(){
     })
     const [online,setOnline] = useState([])
 
-    const socket = io("http://localhost:5000")
 
     const getUsers = () => {
         socket.on("logged", msg => {
@@ -47,6 +46,10 @@ function Home(){
                             </button>
                           </Link>
 
+    const playerJoinedDrawer = () => {
+        socket.emit("emitPlayer", socket.id)
+    }
+
     useEffect(()=>{
         fetch("/api/verify_login")
             .then(response => response.json())
@@ -68,8 +71,11 @@ function Home(){
         <br/>
         <br/>
         <br/>
-        <Link to="/drawer">
-            <button>
+        <Link to = {{
+                pathname: '/drawer',
+                param: user
+                }}>
+            <button onClick = {() => playerJoinedDrawer()}>
                 Draw!
             </button>
         </Link>

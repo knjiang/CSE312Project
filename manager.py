@@ -3,6 +3,9 @@ from collections import defaultdict
 class LobbyManager:
     def __init__(self):
         self.emails = {}
+        self.drawer = None
+        self.chat = []
+        self.answer = 'dog'
     
     def add(self,name,email):
         self.emails[email] = name
@@ -15,6 +18,34 @@ class LobbyManager:
     
     def delete(self,email):
         del self.emails[email]
+
+    def newDrawer(self):
+        
+        self.drawer = list(self.emails.keys())[0]
+        
+        return self.drawer
+
+    def nextDrawer(self):
+        index = list(self.emails.keys()).index(self.drawer)
+        if index + 1 == len(list(self.emails.keys())):
+            index = 0
+        else:
+            index += 1
+        
+        self.drawer = list(self.emails.keys())[index]
+
+        return self.drawer
+
+    def addChat(self, msg):
+        self.chat.append(msg)
+        return self.chat
+
+    def retrieveChat(self):
+        return self.chat
+    
+    def isAnswer(self, email, word):
+        if word == self.answer:
+            return True
 
 class RoomManager(LobbyManager):
     def __init__(self):

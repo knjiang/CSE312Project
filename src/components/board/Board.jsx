@@ -1,17 +1,20 @@
 import React from 'react';
 import './style.css';
 import { TwitterPicker } from 'react-color';
-import { io } from 'socket.io-client';
+import { Socket as socket } from '../../pages/Socket'
 
 class Board extends React.Component {
 
     timeout;
-    socket = io.connect("http://localhost:5000")
 
     constructor(props) {
         super(props);
 
-        this.socket.on("canvas-data", function(data){
+        this.state = {
+            isDrawer: null
+        }
+
+        socket.on("receive_canvas", function(data){
             var image = new Image();
             var canvas = document.querySelector('#board');
             var canvas_data = canvas.getContext('2d');
@@ -19,17 +22,47 @@ class Board extends React.Component {
                 canvas_data.drawImage(image, 0, 0);
             };
             image.src = data;
+            console.log("Received canvas data")
         })
+
 
         this.sizeChange = this.sizeChange.bind(this)
         this.colorChange = this.colorChange.bind(this)
         this.painter = this.painter.bind(this)
+        this.notPainter = this.notPainter.bind(this)
         this.saveImage = this.saveImage.bind(this)
     }
 
     componentDidMount() {
-        this.painter()
+        this.setState({isDrawer: null})
+        let val = null
+        if (this.props.param.user.email == this.props.param.current_drawer) {
+            val = true
+            this.painter()
+        }
+        else{
+            val = false
+            this.notPainter()
+        }
+        if (val != this.state.isDrawer){
+            this.setState({isDrawer: val}, () => console.log("IS THIS A DRAWER", this.state.isDrawer, val))
+        }
         sessionStorage.setItem('size', 5)
+    }
+
+    componentDidUpdate() {
+        let val = null
+        if (this.props.param.user.email == this.props.param.current_drawer) {
+            val = true
+            this.painter()
+        }
+        else{
+            val = false
+            this.notPainter()
+        }
+        if (val != this.state.isDrawer){
+            this.setState({isDrawer: val})
+        }
     }
 
     sizeChange(size) {
@@ -83,8 +116,9 @@ class Board extends React.Component {
             if (orginSocket.timeout != undefined) clearTimeout(orginSocket.timeout);
             orginSocket.timeout = setTimeout(function(){
                 var image = canvas.toDataURL("image/png");
-                orginSocket.socket.emit("canvas-data", image);
-            }, 500);
+                socket.emit("emit_canvas", image);
+            }, 100);
+            console.log("Emitting canvas data")
         };
 
         canvas.addEventListener('mousedown', function(e) {
@@ -94,7 +128,14 @@ class Board extends React.Component {
         canvas.addEventListener('mouseup', function() {
             canvas.removeEventListener('mousemove', onPaint, false);
         }, false);
+    }
 
+    notPainter() {
+        var canvas = document.querySelector('#board');
+        
+        var canvas_sizing = getComputedStyle(canvas);
+        canvas.width = parseInt(canvas_sizing.getPropertyValue('width'), 10);
+        canvas.height = parseInt(canvas_sizing.getPropertyValue('height'), 10);
 
     }
 

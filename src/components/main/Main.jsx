@@ -5,6 +5,7 @@ import Home from '../../pages/Home';
 import Drawer from '../../pages/Drawer';
 import Login from '../../pages/Login';
 import Logout from '../../pages/Logout';
+import newPage from '../../pages/newPage'
 
 
 const Main = () => {
@@ -14,6 +15,7 @@ const Main = () => {
       <Route exact path='/drawer' component={Drawer}></Route>
       <Route exact path='/login' component={Login}></Route>
       <Route exact path='/logout' component={Logout}></Route>
+      <Route exact path='/newPage' component={newPage}></Route>
       <Redirect from='/api/' to='/'></Redirect>
     </Switch>
   );
