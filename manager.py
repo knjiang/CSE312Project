@@ -1,11 +1,14 @@
 from collections import defaultdict
+import random
 
 class LobbyManager:
     def __init__(self):
         self.emails = {}
         self.drawer = None
         self.chat = []
-        self.answer = 'dog'
+        self.wordList = ['cat', 'dog', 'bed', 'socks', 'trumpet', 'car', 'phone']
+        self.prevWords = []
+        self.word = 'dog'
     
     def add(self,name,email):
         self.emails[email] = name
@@ -20,12 +23,18 @@ class LobbyManager:
         del self.emails[email]
 
     def newDrawer(self):
-        
+        '''
+        while len(prevWords) < 3:
+            r = random.randint(0, len(self.wordList))
+            if wordList[r] not in prevWords:
+                prevWords.append(wordList[r])
+        '''
         self.drawer = list(self.emails.keys())[0]
-        
-        return self.drawer
+        #return [drawer, wordList]
+        return [self.drawer, self.wordList]
 
     def nextDrawer(self):
+
         index = list(self.emails.keys()).index(self.drawer)
         if index + 1 == len(list(self.emails.keys())):
             index = 0
@@ -44,7 +53,7 @@ class LobbyManager:
         return self.chat
     
     def isAnswer(self, email, word):
-        if word == self.answer:
+        if word == self.word:
             return True
 
 class RoomManager(LobbyManager):

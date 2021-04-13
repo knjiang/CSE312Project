@@ -23,6 +23,7 @@ class Container extends React.Component {
             game_running: false,
             current_drawer: null,
             user_points: {},
+            wordList: null,
             current_word: null
         }
         this.loadPoints = this.loadPoints.bind(this)
@@ -30,7 +31,7 @@ class Container extends React.Component {
 
         socket.on("newGame", function(data){
             console.log("NEWGAME", data)
-            this.setState({current_drawer: data})
+            this.setState({current_drawer: data[0]})
         }.bind(this))
 
         socket.on("newDrawer", function(data){
