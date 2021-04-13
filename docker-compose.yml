@@ -1,7 +1,11 @@
 version: '3.7'
 
 services:
+  mongo:
+    image: mongo:4.2.5
   app:
     build: .
+    environment:
+      WAIT_HOSTS: mongo:27017
     ports:
       - 3001:3000
