@@ -13,6 +13,9 @@ class LobbyManager:
         #self.emails[email] = name
         self.users[email] = {"status": 1, "name": name, "profile": [], "points": 0}
     
+    def get_email(self):
+        return list(self.emails.keys())
+
     def get_name(self,email):
         return self.users[email]["name"]
 

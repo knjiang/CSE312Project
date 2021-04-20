@@ -62,6 +62,15 @@ function Home(){
         Hi {user.user_name} and {user.user_email}, This is our current homepage   :)
     </h1>
 
+    <Link to = {{
+                pathname: '/chatroom',
+                param: user
+                }}>
+            <button>
+                Chatroom
+            </button>
+    </Link>
+
     <p>
         click on our current drawer, it's not draw with me yet though :(
         <br/>
@@ -80,6 +89,16 @@ function Home(){
         {user.logged_in && logout_button}
         {!user.logged_in && login_button}
     </p>
+    <br />
+    <br/>
+    <Link to = {{
+                pathname: '/settings',
+                param: user
+                }}>
+            <button>
+                Settings
+            </button>
+    </Link>
     <LobbyList users = {online}>
     </LobbyList>
     </div>

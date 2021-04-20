@@ -79,6 +79,11 @@ def stop(data):
     emit('receiveChat', lobby_manager.updateChat('System', 'Game stopped'), broadcast = True)
     emit('endGame', None)
 
+@socketIo.on('onlineUsers')
+def online(data):
+    print("")
+    emit('get_email', lobby_manager.get_email(), broadcast = True)
+
 @socketIo.on('lobbyChat') 
 def nextC(data):
     #data is {email: chat}
