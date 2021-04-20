@@ -9,8 +9,10 @@ function Home(){
     const [user,setUser] = useState({
         logged_in : false,
         user_name : 'Guest',
-        user_email : 'None'
+        user_email : 'None',
+        background : 'light'
     })
+
     const [online,setOnline] = useState([])
 
 
@@ -26,6 +28,30 @@ function Home(){
         socket.emit("logged", data)
         console.log('gottem',data)
     }
+
+    const light_mode = () => {
+        if (user.background == 'light'){
+            return false
+        }
+        return true
+    }
+    
+    const change_mode = () => {
+        if (user.background == 'light'){
+            user.background = 'dark'
+        }
+        else{
+            user.background = 'light'
+        }
+    }
+
+    const light =   <button onClick = {change_mode}>
+                        Toggle Dark Mode 
+                    </button>
+
+    const dark =    <button onClick = {change_mode}>
+                        Toggle Light Mode 
+                    </button>
 
     const delete_user = () => {
         var data = {...user}
@@ -83,6 +109,10 @@ function Home(){
         <br/>
         {user.logged_in && logout_button}
         {!user.logged_in && login_button}
+        <br/>
+        <br/>
+        {user.logged_in && light_mode() && light}
+        {user.logged_in && !light_mode() && dark}
     </p>
     <LobbyList users = {online}>
     </LobbyList>
