@@ -1,9 +1,17 @@
+.allChatContainer {
+    position: relative;
+    right: -30%;
+}
+
 .chatContainer {
+    position: relative;
     background-color: white;
-    width: 15vw;
+    width: 20vw;
     height: 60vh;
-    margin-top: 20vh;
     overflow: scroll;
+    margin-top: 15vh;
+    border: 2px solid black;
+    right: 0%;
 }
 
 .messages {
@@ -12,15 +20,16 @@
     margin: 0.4vw;
     margin-bottom: 0.8vw;
     overflow-wrap: anywhere;
-    width: 13vw;
+    width: 19vw;
     border-top: 1px solid grey;
 }
 
 .inputChat {
     display: flex;
     position: fixed;
-    width: 15vw;
+    width: 20vw;
     text-align: left;
+    border: 2px solid black;
 }
 
 .inputChat input {

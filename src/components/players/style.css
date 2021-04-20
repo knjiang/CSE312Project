@@ -1,10 +1,18 @@
 .playersContainer {
+    position: relative;
     background-color: white;
-    width: 15vw;
-    height: 60vh;
-    margin-top: 20vh;
+    width: 20vw;
+    height: 64.5vh;
+    margin-top: 15vh;
+    border: 2px solid black;
+    left: 15%;
 }
 
 .playerFont {
     font-size: 15px;
+}
+
+.playerList {
+    border-top: 1px solid grey;
+    margin-top: 2vh;
 }

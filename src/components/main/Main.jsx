@@ -7,7 +7,6 @@ import Login from '../../pages/Login';
 import Logout from '../../pages/Logout';
 import newPage from '../../pages/newPage'
 
-
 const Main = () => {
   return (
     <Switch> {/* The Switch decides which component to show based on the current URL.*/}

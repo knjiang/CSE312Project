@@ -80,7 +80,30 @@ class BoardDrawer extends React.Component {
             mouse.y = e.pageY - this.offsetTop;
         }, false);
 
-        
+        var orginSocket = this;
+
+        function onPaint() {
+            canvas_data.beginPath();
+            canvas_data.moveTo(last_mouse.x, last_mouse.y);
+            canvas_data.lineTo(mouse.x, mouse.y);
+            canvas_data.closePath();
+            canvas_data.stroke();
+
+            if (orginSocket.timeout != undefined) clearTimeout(orginSocket.timeout);
+            orginSocket.timeout = setTimeout(function(){
+                var image = canvas.toDataURL("image/png");
+                socket.emit("emit_canvas", image);
+            }, 100);
+            console.log("Emitting canvas data")
+        };
+
+        canvas.addEventListener('mousedown', function(e) {
+            canvas.addEventListener('mousemove', onPaint, false);
+        }, false);
+
+        canvas.addEventListener('mouseup', function() {
+            canvas.removeEventListener('mousemove', onPaint, false);
+        }, false);
     }
 
     notPainter() {
