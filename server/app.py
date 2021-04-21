@@ -4,6 +4,8 @@ from authlib.integrations.flask_client import OAuth
 from flask_socketio import SocketIO, emit
 from time import sleep
 from pymongo import MongoClient 
+from bson.json_util import dumps
+from bson.json_util import loads
 
 app = Flask(__name__)
 socketIo = SocketIO(app, cors_allowed_origins = '*')
@@ -15,7 +17,7 @@ lobby_manager = LobbyManager()
 room_manager = RoomManager()
 client = MongoClient('mongo')
 db = client['email-database']
-light_mode = db['light_mode']
+light_collection = db['light_mode']
 
 @app.route('/api/')
 def homepage():
@@ -31,9 +33,6 @@ def handleLogin(info):
         emit('logged',lobby_manager.members(0),broadcast=True)
     return None 
 
-# @socketIo.on('toggle_light')
-# def handleLight(info):
-#     if info['email']:
 
 @socketIo.on('emit_canvas')
 def sendDrawing(data):
@@ -141,6 +140,14 @@ def is_session():
 def is_on():
     package = {'memebers' : room_manager.members(0)}
     return package 
+
+@app.route('/api/light_mode',methods=['POST'])
+def light_mode():
+    data = request.json
+    if light_collection.find_one({'user_email': data['user_email']}):
+        light_collection.remove({'user_email': data['user_email']})
+    light_collection.insert_one(data)
+    return 'OK' 
 
 
 #for testing

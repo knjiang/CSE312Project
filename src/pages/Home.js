@@ -30,22 +30,39 @@ function Home(){
     }
     
     const change_mode = () => {
+        var updated_user = {}
         if (user.background == 'light'){
-            setUser({...user,
+            updated_user = {...user,
                 background : 'dark',
                 light: false,
                 background_color : '#999',
                 text_color: '#FAFAFA'
-            })
+            }
+            setUser(updated_user)
         }
         else{
-            setUser({...user,
+            updated_user = {...user,
                 background: 'light',
                 light: true,
                 background_color : '#FFF',
                 text_color: '#363537'
-            })
+            }
+            setUser(updated_user)
         }
+        fetch('/api/light_mode', {
+            method: 'POST', // or 'PUT'
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updated_user),
+            })
+            .then(response => response.json())
+            .then(data => {
+            console.log('Success:', data);
+            })
+            .catch((error) => {
+            console.error('Error:', error);
+            });
     }
 
     const light =   <button onClick = {change_mode}>
