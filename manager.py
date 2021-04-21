@@ -3,7 +3,7 @@ import random
 
 class LobbyManager:
     def __init__(self):
-
+        self.socketEvents = {"test": 1}
         self.wordList = ['cat', 'dog', 'bed', 'socks', 'trumpet', 'car', 'phone']
         self.users = {} #{email: {status: 1, name: "", profile: "", points: 0, dm: {}}}, status is 0 = logged out, 1 = loggin in, and 2 = in game
         self.gameStatus = {"status": False, "gameChat": [], "drawer": None, "word": None, "prevChat": None, "round": 0} #{status: False, drawer: "", word: "", prevWords: [], gameChat: []}}
@@ -16,6 +16,11 @@ class LobbyManager:
                  "testemail2.com": [["baronhua@buffalo.edu", "yo"], ["baronhua@buffalo.edu", "wassup"], ["312baron@gmail.com", "my bad"]]}
                 } 
         '''
+    def addEvent(self, e):
+        if e in self.socketEvents.keys():
+            self.socketEvents[e] += 1
+        else:
+            self.socketEvents[e] = 1
 
     def add(self,name,email):
         #self.emails[email] = name
