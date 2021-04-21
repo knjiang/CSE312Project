@@ -10,6 +10,7 @@ flask = "*"
 authlib = "*"
 requests = "*"
 flask-socketio = "*"
+pymongo="*"
 
 [requires]
 python_version = "3.7"

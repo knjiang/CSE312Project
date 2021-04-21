@@ -15,6 +15,12 @@ function Home(){
 
     const [online,setOnline] = useState([])
 
+    const [background,setBack] = useState({
+        background : 'light',
+        light : true,
+        background_color : '#FFF',
+        text_color: '#363537'
+    })
 
     const getUsers = () => {
         socket.on("logged", msg => {
@@ -23,25 +29,28 @@ function Home(){
     }
     const logging_user = (data) => {
         setUser(data);
-        console.log('hi and me')
         data['add'] = true 
         socket.emit("logged", data)
-        console.log('gottem',data)
-    }
-
-    const light_mode = () => {
-        if (user.background == 'light'){
-            return false
-        }
-        return true
     }
     
     const change_mode = () => {
         if (user.background == 'light'){
             user.background = 'dark'
+            setBack({
+                background : 'dark',
+                light: false,
+                background_color : '#999',
+                text_color: '#FAFAFA'
+            })
         }
         else{
             user.background = 'light'
+            setBack({
+                background: 'light',
+                light: true,
+                background_color : '#FFF',
+                text_color: '#363537'
+            })
         }
     }
 
@@ -60,6 +69,7 @@ function Home(){
         socket.emit("logged", data)
         console.log('finished emitting')
     }
+    
     const login_button = <Link to="/login">
                              <button>
                                  Login
@@ -87,16 +97,12 @@ function Home(){
     },[]);
 
     return (
-    <div id = "Homepage">
+    <div style ={{background : background.background_color,margin: 0,height : '100vh', width: '100vw',color:background.text_color}} id = "Homepage">
     <h1>
         Hi {user.user_name} and {user.user_email}, This is our current homepage   :)
     </h1>
 
     <p>
-        click on our current drawer, it's not draw with me yet though :(
-        <br/>
-        <br/>
-        <br/>
         <Link to = {{
                 pathname: '/drawer',
                 param: user
@@ -111,8 +117,8 @@ function Home(){
         {!user.logged_in && login_button}
         <br/>
         <br/>
-        {user.logged_in && light_mode() && light}
-        {user.logged_in && !light_mode() && dark}
+        {user.logged_in && background.light && light}
+        {user.logged_in && !background.light && dark}
     </p>
     <LobbyList users = {online}>
     </LobbyList>
