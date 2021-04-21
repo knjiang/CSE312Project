@@ -75,6 +75,14 @@ function Home(){
                 Draw!
             </button>
         </Link>
+        <Link to = {{
+                pathname: '/messages',
+                param: [user.user_email]
+                }}>
+            <button onClick = {() => (console.log("drawer button clicked for : " + user.user_email))}>
+                Messages!
+            </button>
+        </Link>
         <br/>
         <br/>
         {user.logged_in && logout_button}

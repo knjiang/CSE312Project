@@ -7,12 +7,15 @@ class LobbyManager:
         self.wordList = ['cat', 'dog', 'bed', 'socks', 'trumpet', 'car', 'phone']
         self.users = {} #{email: {status: 1, name: "", profile: "", points: 0, dm: {}}}, status is 0 = logged out, 1 = loggin in, and 2 = in game
         self.gameStatus = {"status": False, "gameChat": [], "drawer": None, "word": None, "prevChat": None, "round": 0} #{status: False, drawer: "", word: "", prevWords: [], gameChat: []}}
-        self.dm = {"312baron@gmail.com": 
+        self.dm = {}
+        '''
+        {"312baron@gmail.com": 
                 {"huangbaron2@gmail.com": [["312baron@gmail.com", "hi"], ["huangbaron2@gmail.com", "bye"], ["huangbaron2@gmail.com", "cool"]],
                  "baronhua@buffalo.edu": [["baronhua@buffalo.edu", "yo"], ["baronhua@buffalo.edu", "wassup"], ["312baron@gmail.com", "my bad"]],
                  "testemail.com": [["baronhua@buffalo.edu", "yo"], ["baronhua@buffalo.edu", "wassup"], ["312baron@gmail.com", "my bad"]],
                  "testemail2.com": [["baronhua@buffalo.edu", "yo"], ["baronhua@buffalo.edu", "wassup"], ["312baron@gmail.com", "my bad"]]}
                 } 
+        '''
 
     def add(self,name,email):
         #self.emails[email] = name
@@ -104,6 +107,25 @@ class LobbyManager:
         if len(self.gameStatus["gameChat"]) > 100:
             self.gameStatus["gameChat"] = self.gameStatus["gameChat"].copy()[:-100]
         return self.gameStatus["gameChat"]
+
+    def updateDM(self, fr, to, dm):
+        if fr in self.dm.keys():
+            if to in self.dm[fr].keys():
+                self.dm[fr][to].append([fr, dm])
+            else:
+                self.dm[fr][to] = [[fr, dm]]
+        else:
+            self.dm[fr] = {to: [[fr, dm]]}
+
+        if to in self.dm.keys():
+            if fr in self.dm[to].keys():
+                self.dm[to][fr].append([fr, dm])
+            else:
+                self.dm[to][fr] = [[fr, dm]]
+        else:
+            self.dm[to] = {fr: [[fr, dm]]}
+
+
     
     def correct(self, email, word):
         if word == self.gameStatus["word"] and email != self.gameStatus["drawer"]:

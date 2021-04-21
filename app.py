@@ -45,7 +45,11 @@ def game(data):
 
 @socketIo.on('updateDM')
 def udm(data):
-    emit('allDM', [lobby_manager.dm])
+    #email from, email to, message
+    if (data):
+        if (data[1]):
+            lobby_manager.updateDM(data[0], data[1], data[2])
+    emit('allDM', [lobby_manager.dm], broadcast = True)
 
 #For starting game and next round
 @socketIo.on('newDrawer') 
@@ -137,7 +141,7 @@ def is_on():
 #for testing
 @app.route('/api/data')
 def u_info():
-    package = {"users": lobby_manager.users, "status": lobby_manager.gameStatus}
+    package = {"users": lobby_manager.users, "status": lobby_manager.gameStatus, "DMS": lobby_manager.dm}
     return package
 
 if __name__ == "__main__":
