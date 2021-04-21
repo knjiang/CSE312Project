@@ -16,14 +16,7 @@ class Chat extends React.Component {
         }
 
         socket.on("receiveChat", function(data){
-            for (let i of data){
-                this.setState({lobbyChat: data}, () => console.log("CHAT RECEIVED", this.state.lobbyChat))
-            }
-        }.bind(this))
-
-        socket.on("answerFound", function(data){
-            socket.emit('nextDrawer', null)
-            console.log("NEXT DRAWWER PLZ")
+            this.setState({lobbyChat: data}, () => console.log("CHAT RECEIVED", data, this.state.lobbyChat))
         }.bind(this))
 
         this.sendChat = this.sendChat.bind(this)
@@ -38,7 +31,6 @@ class Chat extends React.Component {
 
     componentDidUpdate() {
         this.newData.scrollIntoView({ behavior: "smooth" })
-        socket.emit("lobbyChat", null);
     }
     
     sendChat(e) {
@@ -46,6 +38,7 @@ class Chat extends React.Component {
         document.getElementById("inputChat").reset();
         let log = []
         log.push(this.props.param.user.email, this.state.chat)
+        console.log("Chat Sent", log)
         socket.emit("lobbyChat", log);
     }
 
@@ -59,10 +52,10 @@ class Chat extends React.Component {
         li.push(<h1>ChatLog</h1>)
         for (let n of this.state.lobbyChat){
             if (n[0] == 'System'){
-                li.push(<li style = {{fontWeight: 'bold'}}>{n[0]}: {n[1]}</li>)
+                li.push(<li className = "messages" style = {{fontWeight: 'bold', listStyleType: "none"}}>{n[0]}: {n[1]}</li>)
             }
             else{
-                li.push(<li>{n[0]}: {n[1]}</li>)
+                li.push(<li className = "messages" >{n[0]}: {n[1]}</li>)
             }
         }
         li.push(<div ref={(ref) => this.newData = ref}></div>)
@@ -74,7 +67,7 @@ class Chat extends React.Component {
     render() {
         
         return (
-            <div>
+            <div className = 'allChatContainer'>
                 <div className = 'chatContainer'>
                     {this.displayChat()}
                 </div>

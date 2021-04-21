@@ -1,8 +1,18 @@
 import React from 'react';
+import { Link } from "react-router-dom"
 
 function LobbyList(props){
     const listUsers = props.users.map((user) =>
-        <li key ="{user}">{user}</li>
+        <div style = {{display: "inlineFlex"}}><li key ="{user}">{user}</li> 
+            <Link to = {{
+                pathname: '/messages',
+                param: [props.me, user]
+                }}>
+                <button onClick = {() => (console.log("ME", props, user))}>
+                    Message
+                </button>
+            </Link>
+        </div>
     );
     return (
         <div>
