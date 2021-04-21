@@ -82,10 +82,6 @@ function Home(){
                             </button>
                           </Link>
 
-    const playerJoinedDrawer = () => {
-        socket.emit("emitPlayer", socket.id)
-    }
-
     useEffect(()=>{
         fetch("/api/verify_login")
             .then(response => response.json())
@@ -107,7 +103,7 @@ function Home(){
                 pathname: '/drawer',
                 param: user
                 }}>
-            <button onClick = {() => playerJoinedDrawer()}>
+            <button onClick = {() => (console.log("drawer button clicked for : " + user.user_email))}>
                 Draw!
             </button>
         </Link>
@@ -120,7 +116,7 @@ function Home(){
         {user.logged_in && background.light && light}
         {user.logged_in && !background.light && dark}
     </p>
-    <LobbyList users = {online}>
+    <LobbyList users = {online} me = {user["user_email"]}>
     </LobbyList>
     </div>
     );
