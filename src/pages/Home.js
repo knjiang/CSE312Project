@@ -9,10 +9,14 @@ function Home(){
     const [user,setUser] = useState({
         logged_in : false,
         user_name : 'Guest',
-        user_email : 'None'
+        user_email : 'None',
+        background : 'light',
+        light : true,
+        background_color : '#FFF',
+        text_color: '#363537'
     })
-    const [online,setOnline] = useState([])
 
+    const [online,setOnline] = useState([])
 
     const getUsers = () => {
         socket.on("logged", msg => {
@@ -21,11 +25,53 @@ function Home(){
     }
     const logging_user = (data) => {
         setUser(data);
-        console.log('hi and me')
         data['add'] = true 
         socket.emit("logged", data)
-        console.log('gottem',data)
     }
+    
+    const change_mode = () => {
+        var updated_user = {}
+        if (user.background == 'light'){
+            updated_user = {...user,
+                background : 'dark',
+                light: false,
+                background_color : '#999',
+                text_color: '#FAFAFA'
+            }
+            setUser(updated_user)
+        }
+        else{
+            updated_user = {...user,
+                background: 'light',
+                light: true,
+                background_color : '#FFF',
+                text_color: '#363537'
+            }
+            setUser(updated_user)
+        }
+        fetch('/api/light_mode', {
+            method: 'POST', // or 'PUT'
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updated_user),
+            })
+            .then(response => response.json())
+            .then(data => {
+            console.log('Success:', data);
+            })
+            .catch((error) => {
+            console.error('Error:', error);
+            });
+    }
+
+    const light =   <button onClick = {change_mode}>
+                        Toggle Dark Mode 
+                    </button>
+
+    const dark =    <button onClick = {change_mode}>
+                        Toggle Light Mode 
+                    </button>
 
     const delete_user = () => {
         var data = {...user}
@@ -34,6 +80,7 @@ function Home(){
         socket.emit("logged", data)
         console.log('finished emitting')
     }
+    
     const login_button = <Link to="/login">
                              <button>
                                  Login
@@ -57,16 +104,12 @@ function Home(){
     },[]);
 
     return (
-    <div id = "Homepage">
+    <div style ={{background : user.background_color,margin: 0,height : '100vh', width: '100vw',color:user.text_color}} id = "Homepage">
     <h1>
         Hi {user.user_name} and {user.user_email}, This is our current homepage   :)
     </h1>
 
     <p>
-        click on our current drawer, it's not draw with me yet though :(
-        <br/>
-        <br/>
-        <br/>
         <Link to = {{
                 pathname: '/drawer',
                 param: user
@@ -79,6 +122,10 @@ function Home(){
         <br/>
         {user.logged_in && logout_button}
         {!user.logged_in && login_button}
+        <br/>
+        <br/>
+        {user.logged_in && user.light && light}
+        {user.logged_in && !user.light && dark}
     </p>
     <LobbyList users = {online} me = {user["user_email"]}>
     </LobbyList>
