@@ -10,17 +10,13 @@ function Home(){
         logged_in : false,
         user_name : 'Guest',
         user_email : 'None',
-        background : 'light'
-    })
-
-    const [online,setOnline] = useState([])
-
-    const [background,setBack] = useState({
         background : 'light',
         light : true,
         background_color : '#FFF',
         text_color: '#363537'
     })
+
+    const [online,setOnline] = useState([])
 
     const getUsers = () => {
         socket.on("logged", msg => {
@@ -35,8 +31,7 @@ function Home(){
     
     const change_mode = () => {
         if (user.background == 'light'){
-            user.background = 'dark'
-            setBack({
+            setUser({...user,
                 background : 'dark',
                 light: false,
                 background_color : '#999',
@@ -44,8 +39,7 @@ function Home(){
             })
         }
         else{
-            user.background = 'light'
-            setBack({
+            setUser({...user,
                 background: 'light',
                 light: true,
                 background_color : '#FFF',
@@ -93,7 +87,7 @@ function Home(){
     },[]);
 
     return (
-    <div style ={{background : background.background_color,margin: 0,height : '100vh', width: '100vw',color:background.text_color}} id = "Homepage">
+    <div style ={{background : user.background_color,margin: 0,height : '100vh', width: '100vw',color:user.text_color}} id = "Homepage">
     <h1>
         Hi {user.user_name} and {user.user_email}, This is our current homepage   :)
     </h1>
@@ -113,8 +107,8 @@ function Home(){
         {!user.logged_in && login_button}
         <br/>
         <br/>
-        {user.logged_in && background.light && light}
-        {user.logged_in && !background.light && dark}
+        {user.logged_in && user.light && light}
+        {user.logged_in && !user.light && dark}
     </p>
     <LobbyList users = {online} me = {user["user_email"]}>
     </LobbyList>

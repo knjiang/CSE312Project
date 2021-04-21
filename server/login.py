@@ -42,6 +42,9 @@ def is_logged():
         package['logged_in'] = True
         package['user_name'] = session['user']['given_name']
         package['user_email'] = session['user']['email']
-        package['backgorund'] = 'light'
+        package['background'] = 'light'
+        package['light'] = True
+        package['background_color'] = '#FFF'
+        package['text_color'] = '#363537'
     return package
 

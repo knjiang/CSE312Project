@@ -2,7 +2,8 @@ from flask import Flask, url_for, session, redirect
 from flask import render_template, redirect, request
 from authlib.integrations.flask_client import OAuth
 from flask_socketio import SocketIO, emit
-from time import sleep;
+from time import sleep
+from pymongo import MongoClient 
 
 app = Flask(__name__)
 socketIo = SocketIO(app, cors_allowed_origins = '*')
@@ -12,6 +13,9 @@ from manager import LobbyManager, RoomManager
 
 lobby_manager = LobbyManager()
 room_manager = RoomManager()
+client = MongoClient('mongo')
+db = client['email-database']
+light_mode = db['light_mode']
 
 @app.route('/api/')
 def homepage():
@@ -26,6 +30,10 @@ def handleLogin(info):
             lobby_manager.delete(info['user_email'])
         emit('logged',lobby_manager.members(0),broadcast=True)
     return None 
+
+# @socketIo.on('toggle_light')
+# def handleLight(info):
+#     if info['email']:
 
 @socketIo.on('emit_canvas')
 def sendDrawing(data):
@@ -133,6 +141,7 @@ def is_session():
 def is_on():
     package = {'memebers' : room_manager.members(0)}
     return package 
+
 
 #for testing
 @app.route('/api/data')
