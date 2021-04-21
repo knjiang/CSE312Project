@@ -7,7 +7,7 @@ const Logout = () => (
         Hi, This is our current logout page :)
     </h1>
 
-    <button>
+    <button onClick={(e) => (window.location = "http://localhost:5000/api/logout" )}>
         Log out here! 
     </button>
     

@@ -1,0 +1,44 @@
+.allChatContainer {
+    position: relative;
+    right: -30%;
+}
+
+.chatContainer {
+    position: relative;
+    background-color: white;
+    width: 20vw;
+    height: 60vh;
+    overflow: scroll;
+    margin-top: 15vh;
+    border: 2px solid black;
+    right: 0%;
+}
+
+.messages {
+    font-size: 1vw;
+    text-align: left;
+    margin: 0.4vw;
+    margin-bottom: 0.8vw;
+    overflow-wrap: anywhere;
+    width: 19vw;
+    border-top: 1px solid grey;
+}
+
+.inputChat {
+    display: flex;
+    position: fixed;
+    width: 20vw;
+    text-align: left;
+    border: 2px solid black;
+}
+
+.inputChat input {
+    width: 95%;
+    font-size: 1vw;
+    text-align: left;
+}
+
+.chatButton {
+    width: 1vw;
+    height: 3.5vh;
+}

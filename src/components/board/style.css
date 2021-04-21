@@ -1,10 +1,37 @@
 .board {
-    width: 100%;
-    height: 100%;
+    width: 52vw;
+    height: 85vh;
+    background-color: white;
+    text-align: center;
 }
 
-.sketch {
-    border: 2px solid black;
+
+.sizeContainer {
+    margin: auto;
+    text-align: center;
+}
+
+.colorContainer {
+    margin: auto;
+    text-align: center;
+}
+
+.options {
+    position: absolute;
+    margin: auto;
+    text-align: center;
+    display: inline-block;
+    bottom: 5%;
     width: 100%;
-    height: 100%;
+    left: 0%;
+}
+
+
+.boardContainer {
+    text-align: center;
+    margin-top: 5vh;
+    display: inline-block;
+    width: 50vw;
+    height: 78vh;
+    margin-left: 7%;
 }

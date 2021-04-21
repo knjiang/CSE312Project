@@ -1,18 +1,21 @@
 .container {
     position: fixed;
+    text-align: center;
     width: 100%;
     height: 100%;
-    background: rgb(23, 162, 255);
+    background: rgb(0, 78, 129);
+    display: flex;
+    margin: auto;
 }
 
 .color-picker {
     text-align: center;
 }
 
-.board-container {
-    width: 30%;
-    height: 50%;
+.drawerInfo {
+    top: 2%;
+    position: fixed;
     margin: auto;
-    margin-top: 1%;
-    background: white;
+    width: 100%;
+    text-align: center;
 }

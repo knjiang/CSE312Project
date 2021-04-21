@@ -34,10 +34,13 @@ def logout():
     session.pop('user', None)
     return redirect('/api/')
 
+
 @app.route('/api/verify_login')
 def is_logged():
     package = {'logged_in' : False, 'user_name' : 'Guest'}
     if 'user' in session:
         package['logged_in'] = True
         package['user_name'] = session['user']['given_name']
+        package['user_email'] = session['user']['email']
     return package
+
