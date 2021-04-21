@@ -5,10 +5,15 @@ class LobbyManager:
     def __init__(self):
 
         self.wordList = ['cat', 'dog', 'bed', 'socks', 'trumpet', 'car', 'phone']
-        self.users = {} #{email: {status: 1, name: "", profile: "", points: 0}}, status is 0 = logged out, 1 = loggin in, and 2 = in game
+        self.users = {} #{email: {status: 1, name: "", profile: "", points: 0, dm: {}}}, status is 0 = logged out, 1 = loggin in, and 2 = in game
         self.gameStatus = {"status": False, "gameChat": [], "drawer": None, "word": None, "prevChat": None, "round": 0} #{status: False, drawer: "", word: "", prevWords: [], gameChat: []}}
+        self.dm = {"312baron@gmail.com": 
+                {"huangbaron2@gmail.com": [["312baron@gmail.com", "hi"], ["huangbaron2@gmail.com", "bye"], ["huangbaron2@gmail.com", "cool"]],
+                 "baronhua@buffalo.edu": [["baronhua@buffalo.edu", "yo"], ["baronhua@buffalo.edu", "wassup"], ["312baron@gmail.com", "my bad"]],
+                 "testemail.com": [["baronhua@buffalo.edu", "yo"], ["baronhua@buffalo.edu", "wassup"], ["312baron@gmail.com", "my bad"]],
+                 "testemail2.com": [["baronhua@buffalo.edu", "yo"], ["baronhua@buffalo.edu", "wassup"], ["312baron@gmail.com", "my bad"]]}
+                } 
 
-    
     def add(self,name,email):
         #self.emails[email] = name
         self.users[email] = {"status": 1, "name": name, "profile": [], "points": 0}
@@ -50,6 +55,9 @@ class LobbyManager:
 
     def endGame(self):
         self.gameStatus["status"] = False
+        self.gameStatus["drawer"] = None
+        self.gameStatus["word"] = None
+        self.gameStatus["round"] = 0 
         for email in self.users:
             self.users[email]["points"] = 0
 

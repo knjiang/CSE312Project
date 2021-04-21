@@ -80,7 +80,7 @@ function Home(){
         {user.logged_in && logout_button}
         {!user.logged_in && login_button}
     </p>
-    <LobbyList users = {online}>
+    <LobbyList users = {online} me = {user["user_email"]}>
     </LobbyList>
     </div>
     );

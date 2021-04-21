@@ -20,12 +20,15 @@ class Players extends React.Component {
     }
     
     componentDidMount() {
-        this.setState({inGame_users: this.props.param.inGame_users, current_drawer: this.props.param.current_drawer, loaded: true})
+        this.setState({inGame_users: this.props.param.inGame_users, current_drawer: this.props.param.current_drawer, user_points: this.props.param.user_points, loaded: true})
     }
 
     componentDidUpdate() {
         if (this.props.param.inGame_users != this.state.inGame_users){
             this.setState({inGame_users: this.props.param.inGame_users})
+        }
+        if (this.props.param.user_points != this.state.user_points){
+            this.setState({user_points: this.props.param.user_points})
         }
     }
 
@@ -35,7 +38,7 @@ class Players extends React.Component {
         li.push(<li style = {{fontSize: '4vh', margin: '2vh', fontWeight: 'Bold', listStyleType: "none"}}> Players </li>)
         for (let i of this.state.inGame_users){
             //props and state dont update at the same time, state lags
-            console.log("RETURNUSERSs", i, this.state.current_drawer, this.props.param.inGame_users)
+            console.log("RETURNUSERSs", i, this.state.current_drawer, this.props.param.inGame_users, this.state.user_points)
             if ((i == this.props.param.user.email) && (i == this.props.param.user.email)){
                 li.push(<li className = "playerList" style = {{fontWeight: 'Bold', color: 'navy', listStyleType: "none"}}> {i}: {this.state.user_points[i]} </li>)
             }

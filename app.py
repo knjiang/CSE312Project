@@ -43,6 +43,10 @@ def game(data):
         p.append([u, lobby_manager.users[u]["points"]])
     emit('gameUsers', [lobby_manager.members(2), lobby_manager.gameStatus["drawer"], lobby_manager.gameStatus["word"], p], broadcast = True)
 
+@socketIo.on('updateDM')
+def udm(data):
+    emit('allDM', [lobby_manager.dm])
+
 #For starting game and next round
 @socketIo.on('newDrawer') 
 def nextD(nothing):

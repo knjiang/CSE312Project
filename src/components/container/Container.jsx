@@ -44,6 +44,10 @@ class Container extends React.Component {
         socket.on("gameUsers", function(data){
             console.log("NEW USERS", data)
             this.setState({inGame_users: data})
+            for (let p of data[3]){
+                this.setState({user_points: p[0]})
+            }
+            console.log("gameUsersPoints", this.state.user_points)
         }.bind(this))
 
         socket.on("timerUp", function(data){
@@ -54,6 +58,10 @@ class Container extends React.Component {
 
         socket.on("timerLeft", function(data){
             this.setState({timer: data})
+        }.bind(this))
+
+        socket.on("endGame", function(data){
+            
         }.bind(this))
     }
 
@@ -103,6 +111,7 @@ class Container extends React.Component {
     }
 
     componentDidUpdate () {
+        socket.emit('gameStatus', [null, null])
         if (Object.keys(this.state.inGame_users).length < 2){
             if (this.state.game_running){
                 this.setState({game_running: false})
@@ -124,10 +133,10 @@ class Container extends React.Component {
 
     enoughPlayers() {
         if (Object.keys(this.state.inGame_users).length > 1 && this.state.current_drawer == null){
-            return (<button onClick = {() => this.startGame()}>TESTING NEW GAME</button>)
+            return (<button onClick = {() => this.startGame()}>New Game</button>)
         }
         else if (Object.keys(this.state.inGame_users).length > 1 && this.state.current_drawer != null){          
-            return <h1>{this.state.current_drawer} is currently drawing with {this.state.timer} remaining </h1>
+            return <h1>{this.state.current_drawer} is currently drawing with {this.state.timer} seconds remaining </h1>
         }
         else{
             return (<h1>Need more players</h1>)
