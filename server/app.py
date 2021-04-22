@@ -2,7 +2,10 @@ from flask import Flask, url_for, session, redirect
 from flask import render_template, redirect, request
 from authlib.integrations.flask_client import OAuth
 from flask_socketio import SocketIO, emit
-from time import sleep;
+from time import sleep
+from pymongo import MongoClient 
+from bson.json_util import dumps
+from bson.json_util import loads
 
 app = Flask(__name__)
 socketIo = SocketIO(app, cors_allowed_origins = '*')
@@ -12,6 +15,9 @@ from manager import LobbyManager, RoomManager
 
 lobby_manager = LobbyManager()
 room_manager = RoomManager()
+client = MongoClient('mongo')
+db = client['email-database']
+light_collection = db['light_mode']
 
 @app.route('/api/')
 def homepage():
@@ -19,6 +25,7 @@ def homepage():
 
 @socketIo.on('logged')
 def handleLogin(info):
+    lobby_manager.addEvent("logged")
     if info['logged_in']:
         if info['add'] and info['user_email'] not in lobby_manager.users.keys():
             lobby_manager.add(info['user_name'],info['user_email'])
@@ -27,17 +34,25 @@ def handleLogin(info):
         emit('logged',lobby_manager.members(0),broadcast=True)
     return None 
 
+
 @socketIo.on('emit_canvas')
 def sendDrawing(data):
+    lobby_manager.addEvent("canvas")
     emit("receive_canvas", data, broadcast = True)
 
 #updates gamestate with 2 for connect and 1 for disconnect
 #change, email
 @socketIo.on('gameStatus')
 def game(data):
+    lobby_manager.addEvent("gameStatus")
     if data[1]:
         lobby_manager.updateStatus(data[0], data[1])
-
+    if data[0] == False:
+        if len(lobby_manager.members(2)) < 2:
+            lobby_manager.addEvent("stopGame")
+            lobby_manager.endGame()
+            emit('receiveChat', lobby_manager.updateChat('System', 'Game stopped'), broadcast = True)
+            emit('endGame', None)
     p = []
     for u in lobby_manager.users.keys():
         p.append([u, lobby_manager.users[u]["points"]])
@@ -45,11 +60,17 @@ def game(data):
 
 @socketIo.on('updateDM')
 def udm(data):
-    emit('allDM', [lobby_manager.dm])
+    lobby_manager.addEvent("updateDM")
+    #email from, email to, message
+    if (data):
+        if (data[1]):
+            lobby_manager.updateDM(data[0], data[1], data[2])
+    emit('allDM', [lobby_manager.dm], broadcast = True)
 
 #For starting game and next round
 @socketIo.on('newDrawer') 
 def nextD(nothing):
+    lobby_manager.addEvent("newDrawer")
     sec = 5
     lobby_manager.newRound()
     for i in range(5, 0, -1):
@@ -79,12 +100,14 @@ def nextD(nothing):
 #For stopping game
 @socketIo.on('stopGame')
 def stop(data):
+    lobby_manager.addEvent("stopGame")
     lobby_manager.endGame()
     emit('receiveChat', lobby_manager.updateChat('System', 'Game stopped'), broadcast = True)
     emit('endGame', None)
 
 @socketIo.on('lobbyChat') 
 def nextC(data):
+    lobby_manager.addEvent("lobbyChat")
     #data is {email: chat}
     if data:
         sec = 5
@@ -134,10 +157,19 @@ def is_on():
     package = {'memebers' : room_manager.members(0)}
     return package 
 
+@app.route('/api/light_mode',methods=['POST'])
+def light_mode():
+    data = request.json
+    if light_collection.find_one({'user_email': data['user_email']}):
+        light_collection.remove({'user_email': data['user_email']})
+    light_collection.insert_one(data)
+    return 'OK' 
+
+
 #for testing
 @app.route('/api/data')
 def u_info():
-    package = {"users": lobby_manager.users, "status": lobby_manager.gameStatus}
+    package = {"socketEvents": lobby_manager.socketEvents, "users": lobby_manager.users, "status": lobby_manager.gameStatus, "DMS": lobby_manager.dm}
     return package
 
 if __name__ == "__main__":

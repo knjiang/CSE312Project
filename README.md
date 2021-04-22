@@ -21,10 +21,6 @@
    - This can be done with `npm install`
 2. Build static assets
    - This can be done with `npm run start`
-
-
-## Usage
-
 ### Python virtual environment
 
 - Activate the virtual environment with `pipenv shell`
@@ -38,6 +34,14 @@
 - The front-end server can be started with the command `npm run start` 
 - The server can be found at `localhost:3000` 
 
+## Usage
+
+### Docker Startup
+
+- To start up the project, install [Docker](https://docs.docker.com/get-docker/) and Docker for your terminal.
+- Run the command `docker compose up` to run the project in your local environment. 
+- If login isn't working, please follow the `GOOGLE OAuth Required` step where you will need to make a file called `./server/.env` and follow the steps below in order to get login to work.
+
 ### Google OAuth Required
 
-- The login service requires Google OAuth credentials in order to be usable. Please create your own `.env` file and fill out `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` by using the steps in `Create authorization details` from https://developers.google.com/identity/sign-in/web/sign-in
+- The login service requires Google OAuth credentials in order to be usable. Please create your own `.env` file in the directory `./server` and fill out `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` by using the steps in `Create authorization details` from https://developers.google.com/identity/sign-in/web/sign-in
