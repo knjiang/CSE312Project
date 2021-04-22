@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from "react-router-dom"
+import "./style.css"
 
 function LobbyList(props){
     const returnLink = (a, b) => {
@@ -21,7 +22,7 @@ function LobbyList(props){
     );
     return (
         <div>
-            <ul>
+            <ul className = "list_style">
                 {listUsers}
             </ul>
         </div>

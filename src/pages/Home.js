@@ -4,6 +4,8 @@ import {Socket as socket} from "../pages/Socket";
 
 import LobbyList from "../components/LobbyList"
 
+import './style.css'
+
 function Home(){
     
     const [user,setUser] = useState({
@@ -58,28 +60,32 @@ function Home(){
 
     return (
     <div id = "Homepage">
-    <h1>
+    <h1 className = "title">
+        Draw With Me!
+    </h1>
+    <h1 className = "intro">
         Hi {user.user_name} and {user.user_email}, This is our current homepage   :)
     </h1>
-
-    <p>
-        click on our current drawer, it's not draw with me yet though :(
         <br/>
         <br/>
         <br/>
+        <div className = "homepage_buttons">
+        <h1 className = "home_divs">Navigation</h1>
         <Link to = {{
                 pathname: '/drawer',
                 param: user
                 }}>
-            <button onClick = {() => (console.log("drawer button clicked for : " + user.user_email))}>
+            <button className = "draw_button" onClick = {() => (console.log("drawer button clicked for : " + user.user_email))}>
                 Draw!
             </button>
         </Link>
+        <br/>
+        <br/>
         <Link to = {{
                 pathname: '/messages',
                 param: [user.user_email]
                 }}>
-            <button onClick = {() => (console.log("drawer button clicked for : " + user.user_email))}>
+            <button className = "message_button" onClick = {() => (console.log("drawer button clicked for : " + user.user_email))}>
                 Messages!
             </button>
         </Link>
@@ -87,9 +93,12 @@ function Home(){
         <br/>
         {user.logged_in && logout_button}
         {!user.logged_in && login_button}
-    </p>
+        </div>
+        <div className = "online_users">
+            <h1 className = "home_divs">Online Users!</h1>
     <LobbyList users = {online} me = {user["user_email"]}>
     </LobbyList>
+    </div>
     </div>
     );
 }
