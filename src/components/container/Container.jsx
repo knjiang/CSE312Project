@@ -61,7 +61,7 @@ class Container extends React.Component {
         }.bind(this))
 
         socket.on("endGame", function(data){
-            
+            this.setState({game_running: false})
         }.bind(this))
     }
 
@@ -111,13 +111,6 @@ class Container extends React.Component {
     }
 
     componentDidUpdate () {
-        socket.emit('gameStatus', [null, null])
-        if (Object.keys(this.state.inGame_users).length < 2){
-            if (this.state.game_running){
-                this.setState({game_running: false})
-                socket.emit("stopGame", null)
-            }
-        }
         window.onpopstate = e => {
             socket.emit('gameStatus', [false, this.state.user.email])
          }

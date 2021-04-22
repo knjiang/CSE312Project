@@ -1,18 +1,19 @@
 .dmContainer {
     position: fixed;
     width: 100%;
-    height: 100%;
+    height: 92%;
     display: flex;
 }
 
 .tabChat {
-    border: 2px solid blue;
-    width: 30%
+    width: 30%;
+    overflow: scroll;
 }
 
 .dmChat {
-    border: 2px solid red;
+    position: relative;
     width: 70%;
+    overflow: scroll;
 }
 
 .focused {
@@ -21,6 +22,9 @@
     padding-bottom: 2vh;
     margin-top: 0px;
     margin-bottom: 0px;
+    padding-left: 1vw;
+    font-size: 3vh;
+    font-weight: 900;
 }
 
 .friends {
@@ -29,4 +33,61 @@
     padding-bottom: 2vh;
     margin-top: 0px;
     margin-bottom: 0px;
+    font-size: 3vh;
+    padding-left: 1vw;
+    font-weight: 300;
+}
+
+.userMSG {
+    color: blue;
+    text-align: right;
+    font-size: 3vh;
+    background:rgb(213, 235, 255);
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    border-top: 0.25vh solid rgb(14, 14, 116);
+    border-top-left-radius: 5%;
+    padding-right: 1vw;
+    font-weight: 300;
+}
+
+.friendMSG {
+    color: green;
+    text-align: left;
+    font-size: 3vh;
+    background:rgb(229, 255, 231);
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    border-top: 0.25vh solid rgb(14, 116, 57);
+    border-top-right-radius: 5%;
+    padding-left: 1vw;
+    font-weight: 300;
+}
+
+.inputMSG {
+    text-align: left;
+    position: fixed;
+    bottom: 3vh;
+    right: 0vw;
+    width: 65vw;
+}
+
+.inputChatDM {
+    right: 0vw;
+    border-radius: 20vh;
+    border: 2px solid navy;
+    height: 5vh;  
+    width: 60vw;
+    font-size: 3vh;
+}
+
+.dmButton {
+    border-radius: 15vh;
+    width: 4vh;
+    height: 4vh;
+    background-color: navy;
 }

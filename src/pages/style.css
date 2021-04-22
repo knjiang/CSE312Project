@@ -1,0 +1,70 @@
+#Homepage {
+    background-color: light;
+    margin: 0;
+    height: 100vh;
+    width: 100vw;
+    color: #363537
+}
+
+#Login {
+    margin: auto;
+    width: 50%;
+    border: 3px solid gray;
+    border-radius: 25px;
+    padding: 10px;
+    margin-top: 100px;
+    text-align:center;
+
+}
+
+#Logout {
+    margin: auto;
+    width: 50%;
+    border: 3px solid gray;
+    border-radius: 25px;
+    padding: 10px;
+    margin-top: 100px;
+    text-align:center;
+}
+
+.title {
+    text-align: center;
+}
+
+.intro {
+    text-align: center;
+}
+
+.login_button {
+    border-radius: 15px;
+}
+
+.homepage_buttons {
+    /* position: relative; */
+    /* width: fit-content; */
+    float:left;
+    margin-left: 100px;
+    /* background-color: lightblue; */
+    border: 3px solid gray;
+    border-radius: 10px;
+    text-align: center;
+    padding: 10px;
+
+}
+
+.online_users {
+    float: right;
+    /* width: fit-content; */
+    /* background-color: lightcoral; */
+    margin-bottom: 10px;
+    margin-right: 100px;
+    border: 3px solid gray;
+    border-radius: 10px;
+    padding:5px;
+}
+
+.home_divs{
+    text-align: center;
+}
+
+

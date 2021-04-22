@@ -25,6 +25,7 @@ def homepage():
 
 @socketIo.on('logged')
 def handleLogin(info):
+    lobby_manager.addEvent("logged")
     if info['logged_in']:
         if info['add'] and info['user_email'] not in lobby_manager.users.keys():
             lobby_manager.add(info['user_name'],info['user_email'])
@@ -36,15 +37,22 @@ def handleLogin(info):
 
 @socketIo.on('emit_canvas')
 def sendDrawing(data):
+    lobby_manager.addEvent("canvas")
     emit("receive_canvas", data, broadcast = True)
 
 #updates gamestate with 2 for connect and 1 for disconnect
 #change, email
 @socketIo.on('gameStatus')
 def game(data):
+    lobby_manager.addEvent("gameStatus")
     if data[1]:
         lobby_manager.updateStatus(data[0], data[1])
-
+    if data[0] == False:
+        if len(lobby_manager.members(2)) < 2:
+            lobby_manager.addEvent("stopGame")
+            lobby_manager.endGame()
+            emit('receiveChat', lobby_manager.updateChat('System', 'Game stopped'), broadcast = True)
+            emit('endGame', None)
     p = []
     for u in lobby_manager.users.keys():
         p.append([u, lobby_manager.users[u]["points"]])
@@ -52,11 +60,17 @@ def game(data):
 
 @socketIo.on('updateDM')
 def udm(data):
-    emit('allDM', [lobby_manager.dm])
+    lobby_manager.addEvent("updateDM")
+    #email from, email to, message
+    if (data):
+        if (data[1]):
+            lobby_manager.updateDM(data[0], data[1], data[2])
+    emit('allDM', [lobby_manager.dm], broadcast = True)
 
 #For starting game and next round
 @socketIo.on('newDrawer') 
 def nextD(nothing):
+    lobby_manager.addEvent("newDrawer")
     sec = 5
     lobby_manager.newRound()
     for i in range(5, 0, -1):
@@ -86,12 +100,14 @@ def nextD(nothing):
 #For stopping game
 @socketIo.on('stopGame')
 def stop(data):
+    lobby_manager.addEvent("stopGame")
     lobby_manager.endGame()
     emit('receiveChat', lobby_manager.updateChat('System', 'Game stopped'), broadcast = True)
     emit('endGame', None)
 
 @socketIo.on('lobbyChat') 
 def nextC(data):
+    lobby_manager.addEvent("lobbyChat")
     #data is {email: chat}
     if data:
         sec = 5
@@ -153,7 +169,7 @@ def light_mode():
 #for testing
 @app.route('/api/data')
 def u_info():
-    package = {"users": lobby_manager.users, "status": lobby_manager.gameStatus}
+    package = {"socketEvents": lobby_manager.socketEvents, "users": lobby_manager.users, "status": lobby_manager.gameStatus, "DMS": lobby_manager.dm}
     return package
 
 if __name__ == "__main__":
