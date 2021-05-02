@@ -94,6 +94,17 @@ function Home(){
                                 Logout
                             </button>
                           </Link>
+                          
+    const drawButton = <Link to = {{
+                        pathname: '/drawer',
+                        param: user
+                        }}>
+                    <button className = "draw_button" onClick = {() => (console.log("drawer button clicked for : " + user.user_email))}>
+                        Draw!
+                    </button>
+                </Link>
+
+    const noDrawButton = <button>Please login to play or spectate</button>
 
     useEffect(()=>{
         fetch("/api/verify_login")
@@ -104,6 +115,7 @@ function Home(){
             .then(data => setOnline(data.members));
         getUsers(); 
     },[]);
+
 
     return (
     <div style ={{background : user.background_color,margin: 0,height : '100vh', width: '100vw',color:user.text_color}} id = "Homepage">
@@ -118,14 +130,8 @@ function Home(){
         <br/>
         <div className = "homepage_buttons">
         <h1 className = "home_divs">Navigation</h1>
-        <Link to = {{
-                pathname: '/drawer',
-                param: user
-                }}>
-            <button className = "draw_button" onClick = {() => (console.log("drawer button clicked for : " + user.user_email))}>
-                Draw!
-            </button>
-        </Link>
+        {user.logged_in && drawButton}
+        {!user.logged_in && noDrawButton}
         <br/>
         <br/>
         <Link to = {{
@@ -134,6 +140,15 @@ function Home(){
                 }}>
             <button className = "message_button" onClick = {() => (console.log("drawer button clicked for : " + user.user_email))}>
                 Messages!
+            </button>
+        </Link>
+
+        <Link to = {{
+                pathname: '/gallery',
+                param: [user.user_email]
+                }}>
+            <button className = "message_button">
+                Gallery!
             </button>
         </Link>
         <br/>

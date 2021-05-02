@@ -3,21 +3,20 @@ from flask import render_template, redirect, request
 from authlib.integrations.flask_client import OAuth
 from flask_socketio import SocketIO, emit
 from time import sleep
-from pymongo import MongoClient 
 from bson.json_util import dumps
 from bson.json_util import loads
-
 app = Flask(__name__)
 socketIo = SocketIO(app, cors_allowed_origins = '*')
 
 import login
 from manager import LobbyManager, RoomManager
+from mongo import db, usersCol, gameInfoCol, wordListCol, dmCol, imageCol
 
 lobby_manager = LobbyManager()
 room_manager = RoomManager()
-client = MongoClient('mongo')
-db = client['email-database']
+
 light_collection = db['light_mode']
+
 
 @app.route('/api/')
 def homepage():
@@ -25,116 +24,138 @@ def homepage():
 
 @socketIo.on('logged')
 def handleLogin(info):
-    lobby_manager.addEvent("logged")
     if info['logged_in']:
-        if info['add'] and info['user_email'] not in lobby_manager.users.keys():
-            lobby_manager.add(info['user_name'],info['user_email'])
+        if info['add']:
+            lobby_manager.add(info['user_name'], info['user_email'])
         elif info['add'] == False:
             lobby_manager.delete(info['user_email'])
-        emit('logged',lobby_manager.members(0),broadcast=True)
+        emit('logged',lobby_manager.members(3),broadcast=True)
     return None 
 
 
 @socketIo.on('emit_canvas')
 def sendDrawing(data):
-    lobby_manager.addEvent("canvas")
     emit("receive_canvas", data, broadcast = True)
 
-#updates gamestate with 2 for connect and 1 for disconnect
 #change, email
 @socketIo.on('gameStatus')
 def game(data):
-    lobby_manager.addEvent("gameStatus")
-    if data[1]:
-        lobby_manager.updateStatus(data[0], data[1])
-    if data[0] == False:
+    if data[0] == "disconnectGame":
+        lobby_manager.updateStatus(data[0], data[1]) #ok
         if len(lobby_manager.members(2)) < 2:
-            lobby_manager.addEvent("stopGame")
-            lobby_manager.endGame()
-            emit('receiveChat', lobby_manager.updateChat('System', 'Game stopped'), broadcast = True)
-            emit('endGame', None)
-    p = []
-    for u in lobby_manager.users.keys():
-        p.append([u, lobby_manager.users[u]["points"]])
-    emit('gameUsers', [lobby_manager.members(2), lobby_manager.gameStatus["drawer"], lobby_manager.gameStatus["word"], p], broadcast = True)
+            lobby_manager.endGame() #ok
+            emit('receiveChat', lobby_manager.updateChat('System', 'Not enough players, game stopped'), broadcast = True) #ok
+            emit('endGame', None, broadcast = True) #ok
+    elif data[0] == "connectGame":
+        lobby_manager.updateStatus(data[0], data[1])
+
+    #get points in format [email, points]
+    p = lobby_manager.getPoints() #ok
+    drawer = gameInfoCol.find()[0]["drawer"] #ok
+    word = gameInfoCol.find()[0]["word"] #ok
+    emit('gameUsers', [lobby_manager.members(2), drawer, word, p], broadcast = True)
+
+@socketIo.on('getMembers')
+def stat(data):
+    emit("getMembers", lobby_manager.members(data), broadcast = False)
 
 @socketIo.on('updateDM')
 def udm(data):
-    lobby_manager.addEvent("updateDM")
     #email from, email to, message
-    if (data):
-        if (data[1]):
-            lobby_manager.updateDM(data[0], data[1], data[2])
-    emit('allDM', [lobby_manager.dm], broadcast = True)
+    res = []
+    if (data[0] != None and data[1] != None):
+        #adding dms
+        res = lobby_manager.updateDM(data[0], data[1], data[2])
+        if len(res) > 0:
+            emit('upgradeDM', None, broadcast = True)
+            emit('allDM', res, broadcast = False)
+    else:
+        #only extracting
+        res = lobby_manager.updateDM(data[0], None, None)
+        if len(res) > 0:
+            emit('allDM', res, broadcast = False)
+
 
 #For starting game and next round
 @socketIo.on('newDrawer') 
 def nextD(nothing):
-    lobby_manager.addEvent("newDrawer")
-    sec = 5
-    lobby_manager.newRound()
-    for i in range(5, 0, -1):
-        emit ('receiveChat', lobby_manager.updateChat('System', 'The next game will start in {}'.format(sec)), broadcast = True)
-        sec -= 1
-        sleep(1)
-    emit('newDrawer', lobby_manager.newDrawer(), broadcast = True)
-    emit('receiveChat', lobby_manager.updateChat(None, None), broadcast = True)
-    gRound = lobby_manager.gameStatus["round"]
-    nGame = True
-    time = 30
-    while gRound == lobby_manager.gameStatus["round"] and time > -1:
-        if time == -1:
-            nGame = True
-            break
-        if gRound != lobby_manager.gameStatus["round"]:
-            nGame = False
-            break
-        sleep(1)
-        emit('timerLeft', time, broadcast = True)
-        #emit('receiveChat', lobby_manager.updateChat('System', "timer going newDrawer," + str(gRound) + ", " + str(lobby_manager.gameStatus["round"])), broadcast = True)
-        time -= 1
-    if nGame and gRound == lobby_manager.gameStatus["round"]:
-        emit ('receiveChat', lobby_manager.updateChat('System', "Timer's up!"), broadcast = True)
-        emit('timerUp', None, broadcast = True)
+    if (lobby_manager.winner == False and len(lobby_manager.members(2)) > 1):
+        lobby_manager.winner = True
+        sec = 5
+        lobby_manager.newRound()
+        for i in range(5, 0, -1):
+            emit ('receiveChat', lobby_manager.updateChat('System', 'The next game will start in {}'.format(sec)), broadcast = True)
+            sec -= 1
+            sleep(1)
+        lobby_manager.winner = False
+        emit('newDrawer', lobby_manager.newDrawer(), broadcast = True)
+        emit('receiveChat', lobby_manager.updateChat(None, None), broadcast = True)
+        gRound = gameInfoCol.find()[0]["round"]
+        nGame = True
+        time = 30
+        while gRound == gameInfoCol.find()[0]["round"] and time > -1:
+            if time == -1:
+                nGame = True
+                break
+            if gRound != gameInfoCol.find()[0]["round"]:
+                nGame = False
+                break
+            sleep(1)
+            emit('timerLeft', time, broadcast = True)
+            #emit('receiveChat', lobby_manager.updateChat('System', "timer going newDrawer," + str(gRound) + ", " + str(lobby_manager.gameStatus["round"])), broadcast = True)
+            time -= 1
+        if nGame and gRound == gameInfoCol.find()[0]["round"]:
+            emit ('receiveChat', lobby_manager.updateChat('System', "Timer's up!"), broadcast = True)
+            emit('timerUp', None, broadcast = True)
 
 #For stopping game
 @socketIo.on('stopGame')
 def stop(data):
-    lobby_manager.addEvent("stopGame")
     lobby_manager.endGame()
     emit('receiveChat', lobby_manager.updateChat('System', 'Game stopped'), broadcast = True)
     emit('endGame', None)
 
 @socketIo.on('lobbyChat') 
 def nextC(data):
-    lobby_manager.addEvent("lobbyChat")
     #data is {email: chat}
     if data:
         sec = 5
-        if lobby_manager.correct(data[0], data[1]) and data[0] != lobby_manager.gameStatus["drawer"]:
+        player = usersCol.find({"email": data[0]})
+        stat = ''
+        for n in player:
+            stat = n["status"]
+        if lobby_manager.correct(data[0], data[1]) and (data[0] != gameInfoCol.find()[0]["drawer"]) and (stat == 2) and lobby_manager.winner == False and len(lobby_manager.members(2)) > 1:
+            usersCol.update({"email": data[0]}, {
+                "$inc": {
+                    "points": 1
+                }
+            })
+
+            lobby_manager.winner = True
             lobby_manager.newRound()
-            emit('receiveChat', lobby_manager.updateChat('System', data[0] + ' has found the answer of "' +  lobby_manager.gameStatus["word"] + '"!'), broadcast = True)
+            emit('receiveChat', lobby_manager.updateChat('System', data[0] + ' has found the answer of "' + gameInfoCol.find()[0]["word"] + '"!'), broadcast = True)
             for i in range(5, 0, -1):
                 emit ('receiveChat', lobby_manager.updateChat('System', 'The next game will start in {}'.format(sec)), broadcast = True)
                 sec -= 1
                 sleep(1)
             emit('newDrawer', lobby_manager.newDrawer(), broadcast = True)
             emit('receiveChat', lobby_manager.updateChat(None, None), broadcast = True)
-            gRound = lobby_manager.gameStatus["round"]
+            gRound = gameInfoCol.find()[0]["round"]
             nGame = True
             time = 30
-            while gRound == lobby_manager.gameStatus["round"] and time > -1:
+            lobby_manager.winner = False
+            while gRound == gameInfoCol.find()[0]["round"] and time > -1:
                 if time == -1:
                     nGame = True
                     break
-                if gRound != lobby_manager.gameStatus["round"]:
+                if gRound != gameInfoCol.find()[0]["round"]:
                     nGame = False
                     break
                 sleep(1)
                 emit('timerLeft', time, broadcast = True)
                 #emit('receiveChat', lobby_manager.updateChat('System', "timer going lobbyChat," + str(gRound) + ", " + str(lobby_manager.gameStatus["round"])), broadcast = True)
                 time -= 1
-            if nGame and gRound == lobby_manager.gameStatus["round"]:
+            if nGame and gRound == gameInfoCol.find()[0]["round"]:
                 emit ('receiveChat', lobby_manager.updateChat('System', "Timer's up!"), broadcast = True)
                 emit('timerUp', None, broadcast = True)
         else:
@@ -142,9 +163,33 @@ def nextC(data):
     else:
         emit('receiveChat', lobby_manager.updateChat(None, None), broadcast = True)
 
+@socketIo.on('saveImage')
+def save(data):
+    email = data[1]
+    img = data[0]
+    if imageCol.find({"email": email}).count() > 0:
+        imageCol.update({"email": email}, {
+            "$push": {"images": img
+                        }
+        })
+    else:
+        image_data = {"email": email, "images": [img]}
+        imageCol.insert_one(image_data)
+
+@socketIo.on('getImage')
+def get(data):
+    images = []
+    if data:
+        res = imageCol.find({"email": data})
+        for m in res:
+            for i in m["images"]:
+                images.append(i)
+        lobby_manager.tester += 1
+        emit("displayImage", images, broadcast = False)
+
 @app.route('/api/online_users')
 def is_online():
-    package = { 'members' : lobby_manager.members(0) }
+    package = { 'members' : lobby_manager.members(3) }
     return package 
 
 @app.route('/api/session')
@@ -154,7 +199,7 @@ def is_session():
 
 @app.route('/api/online_room')
 def is_on():
-    package = {'memebers' : room_manager.members(0)}
+    package = {'memebers' : room_manager.members(2)}
     return package 
 
 @app.route('/api/light_mode',methods=['POST'])
@@ -169,7 +214,15 @@ def light_mode():
 #for testing
 @app.route('/api/data')
 def u_info():
-    package = {"socketEvents": lobby_manager.socketEvents, "users": lobby_manager.users, "status": lobby_manager.gameStatus, "DMS": lobby_manager.dm}
+    p = []
+    cursor = usersCol.find()
+    if cursor:
+        for m in cursor:
+            try:
+                p.append([m["email"], "Status: " + str(m["status"])])
+            except:
+                p.append("EXCEPTED but WORKS")
+    package = {"Users": p, "tester": lobby_manager.tester}
     return package
 
 if __name__ == "__main__":

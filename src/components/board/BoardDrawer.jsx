@@ -11,35 +11,27 @@ class BoardDrawer extends React.Component {
         super(props);
 
         this.state = {
-            isDrawer: null
+            isDrawer: null,
+            current_drawer: null
         }
-
-        socket.on("receive_canvas", function(data){
-            var image = new Image();
-            var canvas = document.querySelector('#board');
-            var canvas_data = canvas.getContext('2d');
-            image.onload = function() {
-                canvas_data.drawImage(image, 0, 0);
-            };
-            image.src = data;
-            console.log("Received canvas data")
-        })
-
 
         this.sizeChange = this.sizeChange.bind(this)
         this.colorChange = this.colorChange.bind(this)
         this.painter = this.painter.bind(this)
-        this.notPainter = this.notPainter.bind(this)
         this.saveImage = this.saveImage.bind(this)
     }
 
     componentDidMount() {
-        this.setState({isDrawer: null})
-        let val = null
+        this.setState({isDrawer: null, current_drawer: null})
         this.painter()
         sessionStorage.setItem('size', 5)
     }
 
+    componentDidUpdate() {
+        if (this.state.current_drawer != null && this.state.current_drawer != this.props.param.current_drawer){
+            this.setState({current_drawer: this.props.param.current_drawer})
+        }
+    }
 
     sizeChange(size) {
         sessionStorage.setItem('size', size.target.value)
@@ -49,12 +41,16 @@ class BoardDrawer extends React.Component {
     colorChange(color, event) {
         sessionStorage.setItem('color', color.hex)
         console.log(sessionStorage.getItem('color'))
-
     }
 
     saveImage(){
         var canvas = document.querySelector('#board');
-        window.open(canvas.toDataURL("image/png"));
+        //window.open(canvas.toDataURL("image/png"));
+        let img = canvas.toDataURL("image/png");
+        //let windowtab = window.open('about:blank');
+        //windowtab.document.write("<img src = '" + img + "'/>");
+        console.log("Saved image for user: " + this.props.param.user.email)
+        socket.emit("saveImage", [img, this.props.param.user.email])
     }
 
     painter() {
@@ -92,7 +88,7 @@ class BoardDrawer extends React.Component {
             if (orginSocket.timeout != undefined) clearTimeout(orginSocket.timeout);
             orginSocket.timeout = setTimeout(function(){
                 var image = canvas.toDataURL("image/png");
-                socket.emit("emit_canvas", image);
+                socket.emit("emit_canvas", [image, orginSocket.state.current_drawer]);
             }, 100);
             console.log("Emitting canvas data")
         };
@@ -104,15 +100,6 @@ class BoardDrawer extends React.Component {
         canvas.addEventListener('mouseup', function() {
             canvas.removeEventListener('mousemove', onPaint, false);
         }, false);
-    }
-
-    notPainter() {
-        var canvas = document.querySelector('#board');
-        
-        var canvas_sizing = getComputedStyle(canvas);
-        canvas.width = parseInt(canvas_sizing.getPropertyValue('width'), 10);
-        canvas.height = parseInt(canvas_sizing.getPropertyValue('height'), 10);
-
     }
 
     render() {

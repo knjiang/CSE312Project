@@ -10,7 +10,7 @@ class Players extends React.Component {
         super (props);
 
         this.state = {
-            inGame_users: {},
+            inGame_users: null,
             game_running: false,
             current_drawer: null,
             user_points: {},
@@ -20,7 +20,7 @@ class Players extends React.Component {
     }
     
     componentDidMount() {
-        this.setState({inGame_users: this.props.param.inGame_users, current_drawer: this.props.param.current_drawer, user_points: this.props.param.user_points, loaded: true})
+        this.setState({inGame_users: this.props.param.inGame_users, current_drawer: this.props.param.current_drawer, user_points: this.props.param.user_points, loaded: true}, () => "Players loaded with:", "State: ", this.state, "Props", this.props.param)
     }
 
     componentDidUpdate() {
@@ -34,27 +34,30 @@ class Players extends React.Component {
 
     return_users() {
         let li = []
-        console.log("PLAYER PARAM", this.props.param, this.state)
         li.push(<li style = {{fontSize: '4vh', margin: '2vh', fontWeight: 'Bold', listStyleType: "none"}}> Players </li>)
-        for (let i of this.state.inGame_users){
-            //props and state dont update at the same time, state lags
-            console.log("RETURNUSERSs", i, this.state.current_drawer, this.props.param.inGame_users, this.state.user_points)
-            if ((i == this.props.param.user.email) && (i == this.props.param.user.email)){
-                li.push(<li className = "playerList" style = {{fontWeight: 'Bold', color: 'navy', listStyleType: "none"}}> {i}: {this.state.user_points[i]} </li>)
+        if (this.state.inGame_users != null && typeof this.state.inGame_users[Symbol.iterator]){
+            for (let i of this.state.inGame_users){
+                //props and state dont update at the same time, state lags
+                if ((i == this.props.param.user.email) && (i == this.props.param.user.email)){
+                    li.push(<li className = "playerList" style = {{fontWeight: 'Bold', color: 'navy', listStyleType: "none"}}> {i}: {this.state.user_points[i]} </li>)
+                }
+                else if (i == this.props.param.current_drawer){
+                    li.push(<li className = "playerList" style = {{fontWeight: 'Bold', listStyleType: "none"}}> {i}: {this.state.user_points[i]}</li>)
+                }
+                else if (i == this.props.param.user.email){
+                    li.push(<li className = "playerList" style = {{color: 'green', listStyleType: "none"}}> {i}: {this.state.user_points[i]} </li>)
+                }
+                else{
+                    li.push(<li className = "playerList" style = {{listStyleType: "none"}}> {i}: {this.state.user_points[i]} </li>)
+                }
             }
-            else if (i == this.props.param.current_drawer){
-                li.push(<li className = "playerList" style = {{fontWeight: 'Bold', listStyleType: "none"}}> {i}: {this.state.user_points[i]}</li>)
-            }
-            else if (i == this.props.param.user.email){
-                li.push(<li className = "playerList" style = {{color: 'green', listStyleType: "none"}}> {i}: {this.state.user_points[i]} </li>)
-            }
-            else{
-                li.push(<li className = "playerList" style = {{listStyleType: "none"}}> {i}: {this.state.user_points[i]} </li>)
-            }
+            return(
+                li
+            )
         }
-        return(
-            li
-        )
+        else{
+            return <li>No players found</li>
+        }
     }
 
     render() {

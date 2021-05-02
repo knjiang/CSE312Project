@@ -1,141 +1,252 @@
 from collections import defaultdict
 import random
+from mongo import db, usersCol, gameInfoCol, wordListCol, dmCol
 
 class LobbyManager:
     def __init__(self):
-        self.socketEvents = {"test": 1}
-        self.wordList = ['cat', 'dog', 'bed', 'socks', 'trumpet', 'car', 'phone']
-        self.users = {} #{email: {status: 1, name: "", profile: "", points: 0, dm: {}}}, status is 0 = logged out, 1 = loggin in, and 2 = in game
-        self.gameStatus = {"status": False, "gameChat": [], "drawer": None, "word": None, "prevChat": None, "round": 0} #{status: False, drawer: "", word: "", prevWords: [], gameChat: []}}
-        self.dm = {}
+
+        words = {"words": ['cat', 'dog', 'bed', 'socks', 'trumpet', 'car', 'phone']}
+        wordListCol.insert_one(words)
+
+        gameData = {"status": False, "gameChat": [], "drawer": None, "word": None, "prevChat": None, "round": 0, "prevWords": [], "gameChat": []}
+        gameInfoCol.insert_one(gameData)
+
+        #self.wordList = ['cat', 'dog', 'bed', 'socks', 'trumpet', 'car', 'phone'] # MONGOED
+        #self.users = {} # MONGOED {email: {status: 1, name: "", profile: "", points: 0, dm: {}}}, status is 0 = logged out, 1 = loggin in, and 2 = in game
+        #self.gameStatus = {"status": False, "gameChat": [], "drawer": None, "word": None, "prevChat": None, "round": 0} # MONGOED {status: False, drawer: "", word: "", prevWords: [], gameChat: []}}
+        #self.dm = {}
+        self.winner = False
+        self.tester = 0
         '''
-        {"312baron@gmail.com": 
-                {"huangbaron2@gmail.com": [["312baron@gmail.com", "hi"], ["huangbaron2@gmail.com", "bye"], ["huangbaron2@gmail.com", "cool"]],
-                 "baronhua@buffalo.edu": [["baronhua@buffalo.edu", "yo"], ["baronhua@buffalo.edu", "wassup"], ["312baron@gmail.com", "my bad"]],
-                 "testemail.com": [["baronhua@buffalo.edu", "yo"], ["baronhua@buffalo.edu", "wassup"], ["312baron@gmail.com", "my bad"]],
-                 "testemail2.com": [["baronhua@buffalo.edu", "yo"], ["baronhua@buffalo.edu", "wassup"], ["312baron@gmail.com", "my bad"]]}
-                } 
+        {"user": "312baron@gmail.com",
+        "interacted": ["huangbaron2@mgial.com, etc, etc],
+        "messages": {"huangbaron2@gmail.com": [["312baron@gmail.com", "hi"], ["huangbaron2@gmail.com", "bye"], ["huangbaron2@gmail.com", "cool"]],
+            "baronhua@buffalo.edu": [["baronhua@buffalo.edu", "yo"], ["baronhua@buffalo.edu", "wassup"], ["312baron@gmail.com", "my bad"]],
+            "testemail.com": [["baronhua@buffalo.edu", "yo"], ["baronhua@buffalo.edu", "wassup"], ["312baron@gmail.com", "my bad"]],
+            "testemail2.com": [["baronhua@buffalo.edu", "yo"], ["baronhua@buffalo.edu", "wassup"], ["312baron@gmail.com", "my bad"]]}
+            } 
         '''
-    def addEvent(self, e):
-        if e in self.socketEvents.keys():
-            self.socketEvents[e] += 1
-        else:
-            self.socketEvents[e] = 1
 
     def add(self,name,email):
-        #self.emails[email] = name
-        self.users[email] = {"status": 1, "name": name, "profile": [], "points": 0}
+        data = {"email": email, "status": 1, "name": name, "profile": [], "points": 0}
+        result = usersCol.find({"email": email}).count()
+        if result == 0:
+            usersCol.insert_one(data)
+        else:
+            usersCol.update({"email": email}, {
+                "$set": {"status" : 1}
+            })
     
     def get_name(self,email):
-        return self.users[email]["name"]
+        result = usersCol.find_one({"email": email})
+        return result["name"]
 
     def members(self, status):
-        #logged in
-        if status == 1:
-            gameUsers = []
-            for email in self.users:
-                if self.users[email]["status"] == 1:
-                    gameUsers.append(email)
-        #in game
-        if status == 2:
-            gameUsers = []
-            for email in self.users:
-                if self.users[email]["status"] == 2:
-                    gameUsers.append(email)
-        #all users
-        if status == 0:
-            gameUsers = []
-            for email in self.users:
-                gameUsers.append(email)
+        gameUsers = []
+        if status < 3:
+            result = usersCol.find({"status": status})
+            for n in result:
+                gameUsers.append(n["email"])
+        elif status == 3:
+            result_2 = usersCol.find({"status": 2})
+            if result_2:
+                for n in result_2:
+                    gameUsers.append(n["email"])
+            result_1 = usersCol.find({"status": 1})
+            if result_1:
+                for n in result_1:
+                    gameUsers.append(n["email"])
+        elif status == 4:
+            result_2 = usersCol.find({"status": 2})
+            if result_2:
+                for n in result_2:
+                    gameUsers.append(n["email"])
+            result_1 = usersCol.find({"status": 1})
+            if result_1:
+                for n in result_1:
+                    gameUsers.append(n["email"])
+            result_0 = usersCol.find({"status": 0})
+            if result_0:
+                for n in result_0:
+                    gameUsers.append(n["email"])
+            
         return gameUsers
     
     def delete(self,email):
-        del self.users[email]
+        usersCol.update({"email": email}, {
+            "$set": {
+            "status": 0}
+        })
 
     def updateStatus(self, change, email):
-        #True for connect, False for disconnect
-        if change:
-            self.users[email]["status"] = 2
-            self.users[email]["points"] = 0
+        #"connectGame" for connect, "disconnectGame" for disconnect
+        if change == "connectGame":
+            usersCol.update({"email": email}, {
+                "$set": {
+                        "status": 2,
+                        "points": 0}
+            })
         else:
-            self.users[email]["status"] = 1
-            self.users[email]["points"] = 0
+            usersCol.update({"email": email}, {
+                "$set": {
+                        "status": 1,
+                        "points": 0}
+            })
 
     def endGame(self):
-        self.gameStatus["status"] = False
-        self.gameStatus["drawer"] = None
-        self.gameStatus["word"] = None
-        self.gameStatus["round"] = 0 
-        for email in self.users:
-            self.users[email]["points"] = 0
+        gameInfoCol.update({}, {
+            "$set": {
+                "status": False,
+                "drawer": None,
+                "word": None,
+                "round": 0
+            }
+        })
+        usersCol.update({}, {
+                "$set": {
+                "points": 0}
+        })
 
     def newRound(self):
-        self.gameStatus["round"] += 1
+        gameInfoCol.update({}, {
+            "$inc": {
+                "round": 1
+            }
+        })
 
     def newDrawer(self):
-        inGame = []
-        for k in self.users:
-            if self.users[k]["status"] == 2:
-                inGame.append(k)
-        if self.gameStatus["drawer"] != None: #New drawer from running game
-            index = inGame.index(self.gameStatus["drawer"])
-            if index + 1 == len(inGame):
-                index = 0
-            else:
-                index += 1
-            self.gameStatus["drawer"] = inGame[index]
-        else: #New drawer from new game
-            self.gameStatus["drawer"] = list(self.users.copy().keys())[0]
-            self.gameStatus["status"] = True
-            self.gameStatus["prevWords"] = []
-            
-        if len(self.gameStatus["prevWords"]) == 3:
-            self.gameStatus["prevWords"] = self.gameStatus["prevWords"][2:]
+        greater_than = usersCol.find({"status": 2}).count()
+        if greater_than > 1:
+            inGame = []
 
-        wordLL = len(self.gameStatus["prevWords"])
-        while wordLL == len(self.gameStatus["prevWords"]):
-            r = random.randint(0, len(self.wordList) - 1)
-            if self.wordList[r] not in self.gameStatus["prevWords"]:
-                self.gameStatus["prevWords"].append(self.wordList[r])
-                self.gameStatus["word"] = self.wordList[r]
+            result_2 = usersCol.find({"status": 2})
+            for u in result_2:
+                inGame.append(u["email"])
+            resultGameAll = gameInfoCol.find()
+            drawer = resultGameAll[0]["drawer"]
+            if drawer != None: #New drawer from running game
+                index = inGame.index(drawer)
+                if index + 1 == len(inGame):
+                    index = 0
+                else:
+                    index += 1
+                newDrawer = inGame[index]
+                drawer = newDrawer
+                gameInfoCol.update({}, {
+                    "$set": {
+                        "drawer": newDrawer
+                    }
+                })
 
+            else: #New drawer from new game
+                gameInfoCol.update({}, {
+                    "$set": {
+                        "drawer": inGame[0],
+                        "status": True,
+                    }
+                })
+                drawer = gameInfoCol.find()[0]["drawer"]
 
-        #delete the append chat below, change nextDrawer to global newDrawer and incorporate the append chat to app.py
-        self.gameStatus["gameChat"].append(['System', 'New game is starting'])
-        self.gameStatus["gameChat"].append(['System', self.gameStatus["drawer"] + ' is the new drawer!'])
+            prevWordsList = []
+            if len(resultGameAll[0]["prevWords"]) == 3:
+                newPrev = (resultGameAll[0]["prevWords"][:2]).copy()
+                gameInfoCol.update({}, {
+                    "$set": {
+                        "prevWords": newPrev
+                    }
+                })
+                prevWordsList = newPrev
 
-        return [self.gameStatus["drawer"], self.gameStatus["word"]]
+            result = wordListCol.find()
+            n = result[0]["words"]
+            r = random.randint(0, len(n) - 1)
+            while n[r] in prevWordsList:
+                r = random.randint(0, len(n) - 1)
+            word = n[r]
+
+            prevWordsList.append(word)
+            gameInfoCol.update({}, {
+                "$set": {
+                    "prevWords": prevWordsList,
+                    "word": word
+                },
+                "$push": {
+                    "gameChat": {
+                        "$each": [['System', 'New game is starting'], ['System', drawer + 'is the new drawer!']]
+                        }
+                }
+            })
+
+            return [drawer, word]
 
     def updateChat(self, email, msg):
         if msg:
-            self.gameStatus["gameChat"].append([email, msg])
-        if len(self.gameStatus["gameChat"]) > 100:
-            self.gameStatus["gameChat"] = self.gameStatus["gameChat"].copy()[:-100]
-        return self.gameStatus["gameChat"]
+            gameInfoCol.update({}, {
+                "$push": {
+                    "gameChat": [email, msg]
+                }
+            })
+
+        msg = gameInfoCol.find()[0]["gameChat"]
+        if len(msg) > 100:
+            msg = msg.copy()[5:]
+        return msg
 
     def updateDM(self, fr, to, dm):
-        if fr in self.dm.keys():
-            if to in self.dm[fr].keys():
-                self.dm[fr][to].append([fr, dm])
+        #if adding message to database
+        if (fr and to):
+            #new schema to check out:
+            #{"participants": ["A", "B"]
+            # "messages": [
+            #               {"user": "A", "message": "Wassup"}, {"user": "B", "message": "the sky"}
+            #             ]}
+            #to extract, find() every {"from": user} and {"to": user}
+            emailFromExists = dmCol.find_one({"participants": {"$all": [fr, to]}})
+            newDM = {"user": fr, "message": dm}
+            fullDM = {"participants": [fr, to], "messages": [{"user": fr, "message": dm}]}
+            if emailFromExists:
+                dmCol.update({"participants": {"$all": [fr, to]}}, {
+                    "$push": {
+                        "messages": newDM
+                    }
+                })
             else:
-                self.dm[fr][to] = [[fr, dm]]
-        else:
-            self.dm[fr] = {to: [[fr, dm]]}
+                dmCol.insert_one(fullDM)
 
-        if to in self.dm.keys():
-            if fr in self.dm[to].keys():
-                self.dm[to][fr].append([fr, dm])
+        #extracting for one user
+        res_from = dmCol.find({"participants": {"$all": [fr]}}) 
+        res = []
+        lan = {}
+        for n in res_from:
+            receiver = ''
+            if n["participants"][0] != fr:
+                receiver = n["participants"][0]
             else:
-                self.dm[to][fr] = [[fr, dm]]
-        else:
-            self.dm[to] = {fr: [[fr, dm]]}
+                receiver = n["participants"][1]
+            lan[receiver] = []
 
+            for i in n["messages"]:
+                lan[receiver].append([i["user"], i["message"]])
+        res.append(lan)
+        
+        return res
+        #for user_0 (fr), going to return: [{"user_1": [["user_0", "hi"], ["user_1", "bye"]]}, {"user_5": [["user_0", "hi"], ["user_5", "bye"]]}]
 
-    
     def correct(self, email, word):
-        if word == self.gameStatus["word"] and email != self.gameStatus["drawer"]:
-            self.users[email]["points"] += 1
+        wordDB = gameInfoCol.find()[0]["word"]
+        drawerDB = gameInfoCol.find()[0]["drawer"]
+        if word == wordDB and email != drawerDB:
             return True
+        else:
+            return False
+
+
+    def getPoints(self):
+        result = usersCol.find({"status": 2})
+        po = []
+        for m in result:
+            po.append([m["email"], m["points"]])
+        return po
 
 class RoomManager(LobbyManager):
     def __init__(self):

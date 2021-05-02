@@ -14,7 +14,8 @@ class Message extends React.Component {
             user_email: null,
             chat: null,
             focus: null,
-            loaded: false
+            loaded: false,
+            participants: []
             /*
             {"ken": [[ken: "yo"], [ken: "wassup"], [baron: "my bad"]],
              "anthony": [[anthony: "hi"], [baron, "bye"], [anthony, "cool"]],
@@ -28,39 +29,40 @@ class Message extends React.Component {
         this.sendMSG = this.sendMSG.bind(this)
 
         socket.on('allDM', function(tempData) {
-            /*
-            [["anthony", [[anthony: "hi"], [baron, "bye"], [anthony, "cool"]],
-            ["ken", [[ken: "yo"], [ken: "wassup"], [baron: "my bad"]]]
-            */
-            let data = tempData[0]
-                /*
-                bracket[0] is name of friend
-                bracket[1] is collection of messages from old -> new
-                */
-            this.setState({chat: data[this.state.user_email]})
+            if (tempData.length > 0){
+                console.log("DM", tempData, tempData[0])
+                let p = []
+                for (let m of Object.keys(tempData[0])){
+                    p.push(m)
+                }
+                this.setState({chat: tempData[0][this.state.focus], participants: p}, () => console.log("STATE DM", this.state, tempData[0]))
+            }
+        }.bind(this))
+
+        socket.on('upgradeDM', function(data) {
+            socket.emit('updateDM', [this.state.user_email, null, null])
         }.bind(this))
     }
 
     componentDidMount() {
-        socket.emit('updateDM', null)
+        socket.emit('updateDM', [this.state.user_email, null, null])
         /*this.props.location.param[0] = me, this.props.location.param[1] = friend */
         console.log("ENTERED MSG WITH", this.props.location.param)
         if (this.props.location.param[0]){
             this.setState({focus: this.props.location.param[1], user_email: this.props.location.param[0], loaded: true}, () => console.log("MSG ONLOAD", this.state))
         }
-
     }
 
     showFocused() {
         if (this.state.focus){
-            return (<h1 value = {this.state.focus} className = "focused" onClick = {(value) => this.setState({focus: value.target.textContent})}>{this.state.focus}</h1>)
+            return (<h1 value = {this.state.focus} className = "focused" onClick = {(value) => (this.setState({focus: value.target.textContent}), socket.emit('updateDM', [this.state.user_email, null, null]))}>{this.state.focus}</h1>)
         }
     }
     showAll() {
         let p = []
-        for (let n of Object.keys(this.state.chat)){
+        for (let n of this.state.participants){
             if (n != this.state.focus || n != this.state.user_email){
-                p.push(<h1 value = {this.state.focus} className = "focused" onClick = {(value) => this.setState({focus: value.target.textContent})} className = "friends">{n}</h1>)
+                p.push(<h1 value = {this.state.focus} className = "focused" onClick = {(value) => (this.setState({focus: value.target.textContent}), socket.emit('updateDM', [this.state.user_email, null, null]))} className = "friends">{n}</h1>)
             }
         }
         return p
@@ -68,7 +70,7 @@ class Message extends React.Component {
     showChat() {
         if (this.state.focus && this.state.chat){
             let l = []
-            for (let m of this.state.chat[this.state.focus]){
+            for (let m of this.state.chat){
                 if (m[0] == this.state.user_email){
                     l.push(<h1 className = 'userMSG'>{m[0]}: {m[1]}</h1>)
                 }

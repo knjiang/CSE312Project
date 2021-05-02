@@ -16,7 +16,7 @@ class Chat extends React.Component {
         }
 
         socket.on("receiveChat", function(data){
-            this.setState({lobbyChat: data}, () => console.log("CHAT RECEIVED", data, this.state.lobbyChat))
+            this.setState({lobbyChat: data})
         }.bind(this))
 
         this.sendChat = this.sendChat.bind(this)
@@ -38,7 +38,6 @@ class Chat extends React.Component {
         document.getElementById("inputChat").reset();
         let log = []
         log.push(this.props.param.user.email, this.state.chat)
-        console.log("Chat Sent", log)
         socket.emit("lobbyChat", log);
     }
 
@@ -65,7 +64,7 @@ class Chat extends React.Component {
     }
 
     render() {
-        
+    
         return (
             <div className = 'allChatContainer'>
                 <div className = 'chatContainer'>

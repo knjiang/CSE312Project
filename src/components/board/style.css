@@ -1,6 +1,6 @@
 .board {
     width: 52vw;
-    height: 85vh;
+    height: 64.5vh;
     background-color: white;
     text-align: center;
 }
@@ -29,9 +29,9 @@
 
 .boardContainer {
     text-align: center;
-    margin-top: 5vh;
+    margin-top: 15vh;
     display: inline-block;
     width: 50vw;
-    height: 78vh;
+    height: 60vh;
     margin-left: 7%;
 }
