@@ -191,6 +191,19 @@ class LobbyManager:
         if len(msg) > 100:
             msg = msg.copy()[5:]
         return msg
+    
+    def deleteNotification(self,fr,to):
+        notif = notifCol.find_one({"participants": [to,fr]})
+        if notif.count() > 0:
+            notifCol.deleteOne(notif)
+
+
+    def updateNotification(self, fr, to):
+        if (fr and to):
+            notificationExists = notifCol.find_one({"participants": [fr, to]})
+            newNotification = {"participants": [fr,to]}
+            if notificationExists.count() == 0:
+                notifCol.insert_one(newNotification)
 
     def updateDM(self, fr, to, dm):
         #if adding message to database

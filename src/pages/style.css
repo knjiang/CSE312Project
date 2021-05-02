@@ -42,18 +42,17 @@
 .homepage_buttons {
     /* position: relative; */
     /* width: fit-content; */
-    float:left;
+    /* float:left; */
     margin-left: 100px;
     /* background-color: lightblue; */
     border: 3px solid gray;
     border-radius: 10px;
     text-align: center;
     padding: 10px;
-
 }
 
 .online_users {
-    float: right;
+    /* float: left; */
     /* width: fit-content; */
     /* background-color: lightcoral; */
     margin-bottom: 10px;
@@ -61,6 +60,25 @@
     border: 3px solid gray;
     border-radius: 10px;
     padding:5px;
+    margin-left:50px;
+}
+
+.notifications {
+    /* width: fit-content; */
+    /* background-color: lightcoral; */
+    margin-bottom: 10px;
+    margin-right: 100px;
+    border: 3px solid gray;
+    border-radius: 10px;
+    padding:5px;
+}
+
+.container_divs{
+    display: flex;
+    /* grid-template-columns: 1fr 1fr 1fr; */
+}
+.container > div {
+    flex: 1;
 }
 
 .home_divs{

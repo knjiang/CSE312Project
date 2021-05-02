@@ -55,7 +55,7 @@ class Message extends React.Component {
 
     showFocused() {
         if (this.state.focus){
-            return (<h1 value = {this.state.focus} className = "focused" onClick = {(value) => (this.setState({focus: value.target.textContent}), socket.emit('updateDM', [this.state.user_email, null, null]))}>{this.state.focus}</h1>)
+            return (<h1 value = {this.state.focus} className = "focused" onClick = {(value) => (this.setState({focus: value.target.textContent}), socket.emit('updateDM', [this.state.user_email, null, null]),socket.emit('deleteNotification', [this.state.user_email,this.state.focus]))}>{this.state.focus}</h1>)
         }
     }
     showAll() {
@@ -105,6 +105,7 @@ class Message extends React.Component {
         log.push(this.state.user_email, this.state.focus, this.state.sendChat)
         console.log("Chat Sent", log)
         socket.emit("updateDM", log);
+        socket.emit("updateNotification", [this.state.user_email,this.state.focus]);
     }
 
     render() {

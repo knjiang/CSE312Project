@@ -128,43 +128,48 @@ function Home(){
         <br/>
         <br/>
         <br/>
-        <div className = "homepage_buttons">
-        <h1 className = "home_divs">Navigation</h1>
-        {user.logged_in && drawButton}
-        {!user.logged_in && noDrawButton}
-        <br/>
-        <br/>
-        <Link to = {{
-                pathname: '/messages',
-                param: [user.user_email]
-                }}>
-            <button className = "message_button" onClick = {() => (console.log("drawer button clicked for : " + user.user_email))}>
-                Messages!
-            </button>
-        </Link>
+        <div className = "container_divs">
+            <div className = "homepage_buttons">
+                <h1 className = "home_divs">Navigation</h1>
+                {user.logged_in && drawButton}
+                {!user.logged_in && noDrawButton}
+                <br/>
+                <br/>
+                <Link to = {{
+                        pathname: '/messages',
+                        param: [user.user_email]
+                        }}>
+                    <button className = "message_button" onClick = {() => (console.log("drawer button clicked for : " + user.user_email))}>
+                        Messages!
+                    </button>
+                </Link>
 
-        <Link to = {{
-                pathname: '/gallery',
-                param: [user.user_email]
-                }}>
-            <button className = "message_button">
-                Gallery!
-            </button>
-        </Link>
-        <br/>
-        <br/>
-        {user.logged_in && logout_button}
-        {!user.logged_in && login_button}
-        <br/>
-        <br/>
-        {user.logged_in && user.light && light}
-        {user.logged_in && !user.light && dark}
+                <Link to = {{
+                        pathname: '/gallery',
+                        param: [user.user_email]
+                        }}>
+                    <button className = "message_button">
+                        Gallery!
+                    </button>
+                </Link>
+                <br/>
+                <br/>
+                {user.logged_in && logout_button}
+                {!user.logged_in && login_button}
+                <br/>
+                <br/>
+                {user.logged_in && user.light && light}
+                {user.logged_in && !user.light && dark}
+            </div>
+            <div className = "online_users">
+                <h1 className = "home_divs">Online Users!</h1>
+                <LobbyList users = {online} me = {user["user_email"]}>
+                </LobbyList>
+            </div>
+            <div className = "notifications">
+                <h1 className = "home_divs">Notifications</h1>
+            </div>
         </div>
-        <div className = "online_users">
-            <h1 className = "home_divs">Online Users!</h1>
-    <LobbyList users = {online} me = {user["user_email"]}>
-    </LobbyList>
-    </div>
     </div>
     );
 }

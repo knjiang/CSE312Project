@@ -75,6 +75,33 @@ def udm(data):
         if len(res) > 0:
             emit('allDM', res, broadcast = False)
 
+@socketIo.on('deleteNotification')
+def delnotif(data):
+    # data stores email from a to b
+    # delete notif from b to a
+    lobby_manager.deleteNotification(data[0],data[1])
+
+@socketIo.on('updateNotification')
+def udnotif(data):
+    #email from, email to
+    if notifCol.find_one({"participants":[data[0],data[1]]}).count() > 0:
+        continue
+    elif notifCol.find_one({"participants":[data[0],data[1]]}).count() == 0:
+        lobby_manager.updateNotification(data[0],data[1])
+
+    # res = []
+    # if (data[0] != None and data[1] != None):
+    #     #adding dms
+    #     res = lobby_manager.updateDM(data[0], data[1], data[2])
+    #     if len(res) > 0:
+    #         emit('upgradeDM', None, broadcast = True)
+    #         emit('allDM', res, broadcast = False)
+    # else:
+    #     #only extracting
+    #     res = lobby_manager.updateDM(data[0], None, None)
+    #     if len(res) > 0:
+    #         emit('allDM', res, broadcast = False)
+
 
 #For starting game and next round
 @socketIo.on('newDrawer') 
