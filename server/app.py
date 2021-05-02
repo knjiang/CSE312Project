@@ -83,7 +83,7 @@ def nextD(nothing):
         lobby_manager.winner = True
         sec = 5
         lobby_manager.newRound()
-        for i in range(5, 0, -1):
+        while sec > -1 and len(lobby_manager.members(2)) > 1:
             emit ('receiveChat', lobby_manager.updateChat('System', 'The next game will start in {}'.format(sec)), broadcast = True)
             sec -= 1
             sleep(1)
@@ -93,12 +93,14 @@ def nextD(nothing):
         gRound = gameInfoCol.find()[0]["round"]
         nGame = True
         time = 30
-        while gRound == gameInfoCol.find()[0]["round"] and time > -1:
+        while gRound == gameInfoCol.find()[0]["round"] and time > -1 and len(lobby_manager.members(2)) > 1:
             if time == -1:
                 nGame = True
                 break
             if gRound != gameInfoCol.find()[0]["round"]:
                 nGame = False
+                break
+            if len(lobby_manager.members(2)) < 2:
                 break
             sleep(1)
             emit('timerLeft', time, broadcast = True)
@@ -134,7 +136,7 @@ def nextC(data):
             lobby_manager.winner = True
             lobby_manager.newRound()
             emit('receiveChat', lobby_manager.updateChat('System', data[0] + ' has found the answer of "' + gameInfoCol.find()[0]["word"] + '"!'), broadcast = True)
-            for i in range(5, 0, -1):
+            while sec > -1 and len(lobby_manager.members(2)) > 1:
                 emit ('receiveChat', lobby_manager.updateChat('System', 'The next game will start in {}'.format(sec)), broadcast = True)
                 sec -= 1
                 sleep(1)
@@ -144,12 +146,14 @@ def nextC(data):
             nGame = True
             time = 30
             lobby_manager.winner = False
-            while gRound == gameInfoCol.find()[0]["round"] and time > -1:
+            while gRound == gameInfoCol.find()[0]["round"] and time > -1 and len(lobby_manager.members(2)) > 1:
                 if time == -1:
                     nGame = True
                     break
                 if gRound != gameInfoCol.find()[0]["round"]:
                     nGame = False
+                    break
+                if len(lobby_manager.members(2)) < 2:
                     break
                 sleep(1)
                 emit('timerLeft', time, broadcast = True)
@@ -186,6 +190,29 @@ def get(data):
                 images.append(i)
         lobby_manager.tester += 1
         emit("displayImage", images, broadcast = False)
+
+@socketIo.on('deleteImage')
+def delete(data):
+    #image, email
+    img = data[0]
+    email = data[1]
+    needInsert = 0
+    cur = imageCol.find({'email': email})
+    for i in cur:
+        for p in i["images"]:
+            if p == img:
+                needInsert += 1
+    imageCol.update({"email": email}, {
+        '$pull': {
+            "images": img
+        }
+    })
+    if needInsert > 0:
+        for m in range(needInsert):
+            imageCol.update({"email": email}, {
+                "$push": {"images": img
+                }
+            })
 
 @app.route('/api/online_users')
 def is_online():

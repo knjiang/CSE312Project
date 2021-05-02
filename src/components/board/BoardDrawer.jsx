@@ -1,6 +1,5 @@
 import React from 'react';
 import './style.css';
-import { TwitterPicker } from 'react-color';
 import { Socket as socket } from '../../pages/Socket'
 
 class BoardDrawer extends React.Component {
@@ -38,8 +37,8 @@ class BoardDrawer extends React.Component {
         console.log(size.target.value, sessionStorage.getItem('size'))
     }
 
-    colorChange(color, event) {
-        sessionStorage.setItem('color', color.hex)
+    colorChange(color) {
+        sessionStorage.setItem('color', color.target.value)
         console.log(sessionStorage.getItem('color'))
     }
 
@@ -108,18 +107,18 @@ class BoardDrawer extends React.Component {
                 <canvas className = 'board' id = "board"></canvas>
                 <div className = 'options'>
                     <div className = 'sizeContainer'>
-                        <button value = {5} onClick = {(value) => this.sizeChange(value)}>Thin</button>
-                        <button value = {10} onClick = {(value) => this.sizeChange(value)}>Normal</button>
-                        <button value = {15} onClick = {(value) => this.sizeChange(value)}>Thick</button>
-                        <button onClick = {() => this.saveImage()}>SAVE</button>
+                        <button className = 'pickerBTN' value = {5} onClick = {(value) => this.sizeChange(value)}>Thin</button>
+                        <button className = 'pickerBTN' value = {10} onClick = {(value) => this.sizeChange(value)}>Normal</button>
+                        <button className = 'pickerBTN' value = {15} onClick = {(value) => this.sizeChange(value)}>Thick</button>
+                        <button className = 'pickerBTN' onClick = {() => this.saveImage()}>Save Image</button>
                     </div>
+                    <h1>Colors:</h1>
                     <div className = 'colorContainer'>
-                        <TwitterPicker style = {{textAlign: 'center'}}
-                            width = {'20vw'}
-                            triangle = {'hide'}
-                            colors = {['#000000', '#FF0000', '#00D084', '#00D084', '#8ED1FC', '#0693E3', '#ABB8C3', '#EB144C', '#F78DA7', '#9900EF']}
-                            onChangeComplete = { this.colorChange }
-                        />
+                        <button value = '#000000' className = 'pickerBTN' onClick = { (e) => this.colorChange(e)} style = {{backgroundColor: "black"}}></button>
+                        <button value = '#FF0000' className = 'pickerBTN' onClick = { (e) => this.colorChange(e)} style = {{backgroundColor: "red"}}></button>
+                        <button value = '#000cff' className = 'pickerBTN' onClick = { (e) => this.colorChange(e)} style = {{backgroundColor: "blue"}}></button>
+                        <button value = '#00ff1b' className = 'pickerBTN' onClick = { (e) => this.colorChange(e)} style = {{backgroundColor: "green"}}></button>
+                        <button value = '#fffb00' className = 'pickerBTN' onClick = { (e) => this.colorChange(e)} style = {{backgroundColor: "yellow"}}></button>
                     </div>
                 </div>
 
@@ -128,5 +127,12 @@ class BoardDrawer extends React.Component {
         )
     }
 }
+
+
+/*
+<TwitterPicker style = {{textAlign: 'center'}}
+                            width = {'20vw'}
+                            triangle = {'hide'}
+*/
 
 export default BoardDrawer

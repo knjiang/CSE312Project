@@ -51,7 +51,7 @@ class Chat extends React.Component {
         li.push(<h1>ChatLog</h1>)
         for (let n of this.state.lobbyChat){
             if (n[0] == 'System'){
-                li.push(<li className = "messages" style = {{fontWeight: 'bold', listStyleType: "none"}}>{n[0]}: {n[1]}</li>)
+                li.push(<li className = "messages" style = {{color: 'blue', listStyleType: "none"}}>{n[0]}: {n[1]}</li>)
             }
             else{
                 li.push(<li className = "messages" >{n[0]}: {n[1]}</li>)

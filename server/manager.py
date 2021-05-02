@@ -172,7 +172,7 @@ class LobbyManager:
                 },
                 "$push": {
                     "gameChat": {
-                        "$each": [['System', 'New game is starting'], ['System', drawer + 'is the new drawer!']]
+                        "$each": [['System', 'New game is starting'], ['System', drawer + ' is the new drawer!']]
                         }
                 }
             })
@@ -230,6 +230,12 @@ class LobbyManager:
         res.append(lan)
         
         return res
+        """
+                p = []
+        for m in lan.keys():
+            p.append(m)
+        res.append(p) 
+        """
         #for user_0 (fr), going to return: [{"user_1": [["user_0", "hi"], ["user_1", "bye"]]}, {"user_5": [["user_0", "hi"], ["user_5", "bye"]]}]
 
     def correct(self, email, word):

@@ -6,6 +6,7 @@ import Message from '../../pages/messages/Message';
 import Drawer from '../../pages/Drawer';
 import Login from '../../pages/Login';
 import Logout from '../../pages/Logout';
+import Gallery from '../../pages/gallery/Gallery'
 
 const Main = () => {
   return (
@@ -15,6 +16,7 @@ const Main = () => {
       <Route exact path='/login' component={Login}></Route>
       <Route exact path='/logout' component={Logout}></Route>
       <Route exact path='/messages' component={Message}></Route>
+      <Route exact path='/gallery' component={Gallery}></Route>
       <Redirect from='/api/' to='/'></Redirect>
     </Switch>
   );
