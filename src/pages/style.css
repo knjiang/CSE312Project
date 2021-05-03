@@ -61,7 +61,7 @@
     /* background-color: lightcoral; */
     border: 3px solid gray;
     border-radius: 10px;
-    text-align: left;
+    text-align: center;
     padding: 10px;
     overflow-y: scroll;
 }

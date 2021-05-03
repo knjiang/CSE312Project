@@ -15,7 +15,8 @@ class Message extends React.Component {
             chat: null,
             focus: null,
             loaded: false,
-            participants: []
+            participants: [],
+            search: ''
             /*
             {"ken": [[ken: "yo"], [ken: "wassup"], [baron: "my bad"]],
              "anthony": [[anthony: "hi"], [baron, "bye"], [anthony, "cool"]],
@@ -27,6 +28,7 @@ class Message extends React.Component {
         this.showChat = this.showChat.bind(this)
         this.changeMSG = this.changeMSG.bind(this)
         this.sendMSG = this.sendMSG.bind(this)
+        this.searcher = this.searcher.bind(this)
 
         socket.on('allDM', function(tempData) {
             if (tempData.length > 0 && Object.keys(tempData[0]).length > 0){
@@ -71,7 +73,12 @@ class Message extends React.Component {
     showAll() {
         let p = []
         for (let n of this.state.participants){
-            if (n != this.state.focus || n != this.state.user_email){
+            if (this.state.search){
+                if ((n != this.state.focus || n != this.state.user_email) && n.toUpperCase().includes(this.state.search.toUpperCase())){
+                    p.push(<h1 value = {this.state.focus} className = "focused" onClick = {(value) => (this.setState({focus: value.target.textContent}), socket.emit('updateDM', [this.state.user_email, null, null]), socket.emit('updateNotification', ['delete', this.state.user_email,this.state.focus]))} className = "friends">{n}</h1>)
+                }
+            }
+            else {
                 p.push(<h1 value = {this.state.focus} className = "focused" onClick = {(value) => (this.setState({focus: value.target.textContent}), socket.emit('updateDM', [this.state.user_email, null, null]), socket.emit('updateNotification', ['delete', this.state.user_email,this.state.focus]))} className = "friends">{n}</h1>)
             }
         }
@@ -118,12 +125,24 @@ class Message extends React.Component {
         socket.emit("updateNotification", ["add", this.props.location.param[0], this.state.focus]);
     }
 
+    searcher() {
+        return(
+        <form className = 'searchContainer'>
+            <label>
+                Search for users:
+                <input onChange = {(e) => this.setState({"search": e.target.value})} type="text" name="email" />
+            </label>
+        </form>
+        )
+    }
+
     render() {
         if (this.state.loaded && !this.state.chat && !this.state.focus) {
             return(
                 <div className = 'dmContainer'>
                     <div className = 'tabChat'>
                         {this.showFocused()}
+                        {this.searcher()}
                         {this.showAll()}
                     </div>
                 </div>  
@@ -134,6 +153,7 @@ class Message extends React.Component {
                 <div className = 'dmContainer'>
                     <div className = 'tabChat'>
                         {this.showFocused()}
+                        {this.searcher()}
                         {this.showAll()}
                     </div>
                     <div className = 'dmChat'>
@@ -147,6 +167,7 @@ class Message extends React.Component {
                 <div className = 'dmContainer'>
                     <div className = 'tabChat'>
                         {this.showFocused()}
+                        {this.searcher()}
                         {this.showAll()}
                     </div>
                     <div className = 'dmChat'>
@@ -156,7 +177,7 @@ class Message extends React.Component {
             )
         }
         else{
-            return (<div> Leading </div>)
+            return (<div> Loading failed, please re-enter from homepage </div>)
         }
     }
 }

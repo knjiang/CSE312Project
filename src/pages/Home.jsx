@@ -129,7 +129,7 @@ function Home(){
         console.log("did it change?", displayNotifications)
     } 
     */
-    const noNotifications = <h1 style = {{fontSize: "1vh"}}>No notifications</h1>
+    const noNotifications = <h1 style = {{fontSize: "2vh"}}>No notifications</h1>
 
     useEffect(()=>{
         fetch("/api/verify_login")
