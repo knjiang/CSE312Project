@@ -207,13 +207,15 @@ def delete(data):
         for p in i["images"]:
             if p == img:
                 needInsert += 1
+                lobby_manager.tester += 1
     imageCol.update({"email": email}, {
         '$pull': {
             "images": img
         }
     })
     if needInsert > 0:
-        for m in range(needInsert):
+        for m in range(needInsert - 1):
+            lobby_manager.tester_2 += 1
             imageCol.update({"email": email}, {
                 "$push": {"images": img
                 }
@@ -232,7 +234,6 @@ def noti(data):
         if notiCol.find({"to": to, "from": fr}).count() == 0:
             notiCol.insert_one(n)
     elif data[0] == "delete":
-        lobby_manager.tester += 1
         notiCol.remove({"to": fr, "from": to})
     res = []
     cur = notiCol.find({"to": to})
@@ -241,6 +242,13 @@ def noti(data):
             res.insert(0, i["from"])
     emit("retrieveNotification", [to, res], broadcast = True)
 
+@app.route('/api/light_mode',methods=['POST'])
+def light_mode():
+    data = request.json
+    if light_collection.find_one({'user_email': data['user_email']}):
+        light_collection.remove({'user_email': data['user_email']})
+    light_collection.insert_one(data)
+    return 'OK' 
 
 @app.route('/api/online_users')
 def is_online():
@@ -257,14 +265,6 @@ def is_on():
     package = {'memebers' : room_manager.members(2)}
     return package 
 
-@app.route('/api/light_mode',methods=['POST'])
-def light_mode():
-    data = request.json
-    if light_collection.find_one({'user_email': data['user_email']}):
-        light_collection.remove({'user_email': data['user_email']})
-    light_collection.insert_one(data)
-    return 'OK' 
-
 
 #for testing
 @app.route('/api/data')
@@ -277,8 +277,9 @@ def u_info():
                 p.append([m["email"], "Status: " + str(m["status"])])
             except:
                 p.append("EXCEPTED but WORKS")
-    package = {"Users": p, "tester": lobby_manager.tester}
+    package = {"Users": p, "tester": lobby_manager.tester, "tester2": lobby_manager.tester_2}
     return package
+
 
 if __name__ == "__main__":
     socketIo.run(app)

@@ -17,6 +17,7 @@ class LobbyManager:
         #self.dm = {}
         self.winner = False
         self.tester = 0
+        self.tester_2 = 0
         '''
         {"user": "312baron@gmail.com",
         "interacted": ["huangbaron2@mgial.com, etc, etc],

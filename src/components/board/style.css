@@ -29,11 +29,9 @@
 
 .boardContainer {
     text-align: center;
-    margin-top: 15vh;
     display: inline-block;
     width: 50vw;
     height: 60vh;
-    margin-left: 7%;
 }
 
 .pickerBTN {

@@ -37,8 +37,12 @@ class Container extends React.Component {
 
         socket.on("newDrawer", function(data){
             socket.emit("gameStatus", ["retrieve", "retrieve"]);
-            this.setState({current_drawer: data[0], current_word: data[1]})
-            this.setState({timer: 30}, () => this.updateTimer)
+            if (data){
+                if (data[0] && data[1]){
+                    this.setState({current_drawer: data[0], current_word: data[1]})
+                    this.setState({timer: 30}, () => this.updateTimer)
+                }
+            }
         }.bind(this))
 
         socket.on("gameUsers", function(data){
@@ -139,6 +143,7 @@ class Container extends React.Component {
                             <button onClick= {() => (this.disconnectGame())}>Disconnect from game</button>
                             <h1 style = {{fontSize: "4vh"}}>You are currently drawing:"{this.state.current_word}" </h1>
                         </div>
+                            
                             <div>
                                 <Players param = {this.state}/>
                             </div>

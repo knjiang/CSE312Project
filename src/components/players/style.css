@@ -3,9 +3,8 @@
     background-color: white;
     width: 20vw;
     height: 64.5vh;
-    margin-top: 15vh;
     border: 2px solid black;
-    left: 15%;
+    margin-left: 5vw;
 }
 
 .playerFont {
