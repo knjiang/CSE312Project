@@ -1,9 +1,8 @@
 from authlib.integrations.flask_client import OAuth
 import os
 from app import *
+from mongo import db
 
-client = MongoClient('mongo')
-db = client['email-database']
 light_collection = db['light_mode']
 
 app.config.from_object('config')

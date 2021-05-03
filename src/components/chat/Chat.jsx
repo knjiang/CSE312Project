@@ -16,7 +16,7 @@ class Chat extends React.Component {
         }
 
         socket.on("receiveChat", function(data){
-            this.setState({lobbyChat: data}, () => console.log("CHAT RECEIVED", data, this.state.lobbyChat))
+            this.setState({lobbyChat: data})
         }.bind(this))
 
         this.sendChat = this.sendChat.bind(this)
@@ -38,7 +38,6 @@ class Chat extends React.Component {
         document.getElementById("inputChat").reset();
         let log = []
         log.push(this.props.param.user.email, this.state.chat)
-        console.log("Chat Sent", log)
         socket.emit("lobbyChat", log);
     }
 
@@ -52,7 +51,7 @@ class Chat extends React.Component {
         li.push(<h1>ChatLog</h1>)
         for (let n of this.state.lobbyChat){
             if (n[0] == 'System'){
-                li.push(<li className = "messages" style = {{fontWeight: 'bold', listStyleType: "none"}}>{n[0]}: {n[1]}</li>)
+                li.push(<li className = "messages" style = {{color: 'blue', listStyleType: "none"}}>{n[0]}: {n[1]}</li>)
             }
             else{
                 li.push(<li className = "messages" >{n[0]}: {n[1]}</li>)
@@ -65,7 +64,7 @@ class Chat extends React.Component {
     }
 
     render() {
-        
+    
         return (
             <div className = 'allChatContainer'>
                 <div className = 'chatContainer'>

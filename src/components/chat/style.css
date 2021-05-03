@@ -1,6 +1,11 @@
 .allChatContainer {
     position: relative;
-    right: -30%;
+    background-color: white;
+    width: 20vw;
+    height: 64.5vh;
+    /*margin-top: 15vh;*/
+    border: 2px solid black;
+    margin-right: 5vw;
 }
 
 .chatContainer {
@@ -9,36 +14,38 @@
     width: 20vw;
     height: 60vh;
     overflow: scroll;
-    margin-top: 15vh;
+    /*margin-top: 15vh;*/
     border: 2px solid black;
-    right: 0%;
 }
 
 .messages {
-    font-size: 1vw;
+    font-size: 0.75vw;
     text-align: left;
     margin: 0.4vw;
     margin-bottom: 0.8vw;
     overflow-wrap: anywhere;
     width: 19vw;
+    max-width: 19vw;
     border-top: 1px solid grey;
 }
 
 .inputChat {
+    max-width: 20vw;
     display: flex;
-    position: fixed;
     width: 20vw;
     text-align: left;
     border: 2px solid black;
 }
 
 .inputChat input {
+    max-width: 95%;
     width: 95%;
     font-size: 1vw;
     text-align: left;
 }
 
 .chatButton {
+    max-width: 1vw;
     width: 1vw;
     height: 3.5vh;
 }
