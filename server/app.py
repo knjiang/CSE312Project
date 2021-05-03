@@ -10,7 +10,7 @@ socketIo = SocketIO(app, cors_allowed_origins = '*')
 
 import login
 from manager import LobbyManager, RoomManager
-from mongo import db, usersCol, gameInfoCol, wordListCol, dmCol, imageCol
+from mongo import db, usersCol, gameInfoCol, wordListCol, dmCol, imageCol, notiCol
 
 lobby_manager = LobbyManager()
 room_manager = RoomManager()
@@ -27,6 +27,12 @@ def handleLogin(info):
     if info['logged_in']:
         if info['add']:
             lobby_manager.add(info['user_name'], info['user_email'])
+            res = []
+            cur = notiCol.find({"to": info['user_email']})
+            if cur:
+                for i in cur:
+                    res.append(i["from"])
+            emit("retrieveNotification", [info['user_email'], res], broadcast = True)
         elif info['add'] == False:
             lobby_manager.delete(info['user_email'])
         emit('logged',lobby_manager.members(3),broadcast=True)
@@ -188,7 +194,6 @@ def get(data):
         for m in res:
             for i in m["images"]:
                 images.append(i)
-        lobby_manager.tester += 1
         emit("displayImage", images, broadcast = False)
 
 @socketIo.on('deleteImage')
@@ -213,6 +218,29 @@ def delete(data):
                 "$push": {"images": img
                 }
             })
+
+@socketIo.on('updateNotification')
+def noti(data):
+    fr = data[1]
+    to = data[2]
+    #notification format = {'from': "A", 'to': "B"}
+    #A sending to B, fr = A, to = B => {A, B}, {fr, to}, notification for B
+    #B opens, fr = B, to = A, remove {A, B} => {A, B}, {to, fr}
+    #add retrieve => {}
+    n = {"to": to, "from": fr}
+    if data[0] == "add":
+        if notiCol.find({"to": to, "from": fr}).count() == 0:
+            notiCol.insert_one(n)
+    elif data[0] == "delete":
+        lobby_manager.tester += 1
+        notiCol.remove({"to": fr, "from": to})
+    res = []
+    cur = notiCol.find({"to": to})
+    if cur:
+        for i in cur:
+            res.insert(0, i["from"])
+    emit("retrieveNotification", [to, res], broadcast = True)
+
 
 @app.route('/api/online_users')
 def is_online():

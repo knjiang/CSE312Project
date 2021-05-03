@@ -64,14 +64,15 @@ class Message extends React.Component {
 
     showFocused() {
         if (this.state.focus){
-            return (<h1 value = {this.state.focus} className = "focused" onClick = {(value) => (socket.emit('updateDM', [this.state.user_email, null, null]),socket.emit('deleteNotification', [this.state.user_email,this.state.focus]))}>Currently talking with: {this.state.focus}</h1>)
+            socket.emit('updateNotification', ['delete', this.state.user_email,this.state.focus])
+            return (<h1 value = {this.state.focus} className = "focused" onClick = {(value) => (socket.emit('updateDM', [this.state.user_email, null, null]))}>Currently talking with: {this.state.focus}</h1>)
         }
     }
     showAll() {
         let p = []
         for (let n of this.state.participants){
             if (n != this.state.focus || n != this.state.user_email){
-                p.push(<h1 value = {this.state.focus} className = "focused" onClick = {(value) => (this.setState({focus: value.target.textContent}), socket.emit('updateDM', [this.state.user_email, null, null]), socket.emit('deleteNotification', [this.state.user_email,this.state.focus]))} className = "friends">{n}</h1>)
+                p.push(<h1 value = {this.state.focus} className = "focused" onClick = {(value) => (this.setState({focus: value.target.textContent}), socket.emit('updateDM', [this.state.user_email, null, null]), socket.emit('updateNotification', ['delete', this.state.user_email,this.state.focus]))} className = "friends">{n}</h1>)
             }
         }
         return p
@@ -111,10 +112,10 @@ class Message extends React.Component {
         e.preventDefault();
         document.getElementById("inputMSG").reset();
         let log = []
-        log.push(this.state.user_email, this.state.focus, this.state.sendChat)
+        log.push(this.props.location.param[0], this.state.focus, this.state.sendChat)
         console.log("Chat Sent", log)
         socket.emit("updateDM", log);
-        socket.emit("updateNotification", [this.state.user_email,this.state.focus]);
+        socket.emit("updateNotification", ["add", this.props.location.param[0], this.state.focus]);
     }
 
     render() {
