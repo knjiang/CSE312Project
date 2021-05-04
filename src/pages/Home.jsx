@@ -114,10 +114,19 @@ function Home(){
     const noDrawButton = <button>Please login to play or spectate</button>
 
     const displayNotifications = notiRef.current.map((user) =>
-        <h1 className = "notiList">Unread message from: {user}</h1>
+        <div><h1 className = "notiList">Unread message from: {user}</h1>
+        <Link to = {{
+            pathname: '/messages',
+            param: [userRef.current['user_email'], user]
+            }}>
+            <button>
+                Message {user}
+            </button>
+        </Link>
+        </div>
     );
 
-    const greetUser = <h1 className = "intro">  Hi {user.user_name} and {user.user_email}, This is our current homepage   :)</h1>
+    const greetUser = <h1 className = "intro">  Hi {user.user_name} ({user.user_email}), This is our current homepage   :)</h1>
     const greetGuest = <h1 className = "intro">  Hi guest, This is our current homepage   :)</h1>
     /*
     const updateNoti = () => {
