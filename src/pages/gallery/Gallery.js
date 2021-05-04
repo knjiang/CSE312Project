@@ -85,9 +85,10 @@ class Gallery extends React.Component {
         winImage.document.write(image.outerHTML);
     }
 
-    deleteImage(e, m, p) {
+    deleteImage(e, m_img, p, m_title) {
         e.preventDefault()
-        socket.emit("deleteImage", [m, p])
+        socket.emit("deleteImage", [m_img, p, m_title])
+        socket.emit("getImage", this.props.location.param[0])
     }
 
 
@@ -98,18 +99,19 @@ class Gallery extends React.Component {
                 if (this.props.location.param){
                     if (this.state.focus == this.props.location.param[0]){
                         for (let m of this.state.imagery){
-                            imageList.push(<div className = 'imgWrapper'><img onClick = {(e) => this.openImage(e, m)} className = 'imgs' src = {m}></img><br/><button style = {{marginBottom: "3vh"}} onClick = {(e) => this.deleteImage(e, m, this.state.focus)}>Delete</button></div>)
+                            //m[0] == img, m[1] == title
+                            imageList.push(<div className = 'imgWrapper'><img onClick = {(e) => this.openImage(e, m[0])} className = 'imgs' src = {m[0]}></img><br/><h1>{m[1]}</h1><button style = {{marginBottom: "3vh"}} onClick = {(e) => this.deleteImage(e, m[0], this.state.focus, m[1])}>Delete</button></div>)
                         }
                     }
                     else {
                         for (let m of this.state.imagery){
-                            imageList.push(<div className = 'imgWrapper'><img onClick = {(e) => this.openImage(e, m)} className = 'imgs' src = {m}></img><br/></div>)
+                            imageList.push(<div className = 'imgWrapper'><img onClick = {(e) => this.openImage(e, m[0])} className = 'imgs' src = {m[0]}></img><br/><h1>{m[1]}</h1></div>)
                         }
                     }
                 }
                 else{
                     for (let m of this.state.imagery){
-                        imageList.push(<div className = 'imgWrapper'><img onClick = {(e) => this.openImage(e, m)} className = 'imgs' src = {m}></img><br/></div>)
+                        imageList.push(<div className = 'imgWrapper'><img onClick = {(e) => this.openImage(e, m[0])} className = 'imgs' src = {m[0]}></img><br/><h1>{m[1]}</h1></div>)
                     }
                 }
             }

@@ -5,7 +5,7 @@ from mongo import db, usersCol, gameInfoCol, wordListCol, dmCol
 class LobbyManager:
     def __init__(self):
 
-        words = {"words": ['cat', 'dog', 'bed', 'socks', 'trumpet', 'car', 'phone']}
+        words = {"words": ['cat', 'dog', 'bed', 'socks', 'trumpet', 'car', 'phone', 'mushroom', 'hat', 'bat', 'basketball', 'sun', 'tree']}
         wordListCol.insert_one(words)
 
         gameData = {"status": False, "gameChat": [], "drawer": None, "word": None, "prevChat": None, "round": 0, "prevWords": [], "gameChat": []}
@@ -17,7 +17,6 @@ class LobbyManager:
         #self.dm = {}
         self.winner = False
         self.tester = 0
-        self.tester_2 = 0
         '''
         {"user": "312baron@gmail.com",
         "interacted": ["huangbaron2@mgial.com, etc, etc],

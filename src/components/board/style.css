@@ -35,5 +35,9 @@
 }
 
 .pickerBTN {
-    height: 2vh;
+    height: 4vh;
+}
+
+.pickerBTNC {
+    height: 2.5vh;
 }

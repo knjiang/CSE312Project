@@ -39,7 +39,7 @@ class Players extends React.Component {
             for (let i of this.state.inGame_users){
                 //props and state dont update at the same time, state lags
                 if ((i == this.props.param.user.email) && (i == this.props.param.user.email)){
-                    li.push(<li className = "playerList" style = {{fontWeight: 'Bold', color: 'navy', listStyleType: "none"}}> {i}: {this.state.user_points[i]} </li>)
+                    li.push(<li className = "playerList" style = {{fontWeight: 'Bold', color: 'green', listStyleType: "none"}}> {i}: {this.state.user_points[i]} </li>)
                 }
                 else if (i == this.props.param.current_drawer){
                     li.push(<li className = "playerList" style = {{fontWeight: 'Bold', listStyleType: "none"}}> {i}: {this.state.user_points[i]}</li>)

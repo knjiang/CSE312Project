@@ -5,7 +5,7 @@ import "./style.css"
 function LobbyList(props){
     const returnLink = (a, b) => {
         if (a != b){
-            return (            <Link to = {{
+            return ( <Link to = {{
                 pathname: '/messages',
                 param: [a, b]
                 }}>
@@ -16,7 +16,7 @@ function LobbyList(props){
         }
     }
     const listUsers = props.users.map((user) =>
-        <div style = {{display: "inlineFlex"}}><li key ="{user}">{user}</li> 
+        <div style = {{display: "flex-wrap", textAlign: "center"}}><li key ="{user}">{user}</li> 
         {returnLink(props.me, user)}
         </div>
     );

@@ -89,7 +89,7 @@ def nextD(nothing):
         lobby_manager.winner = True
         sec = 5
         lobby_manager.newRound()
-        while sec > -1 and len(lobby_manager.members(2)) > 1:
+        while sec > 0 and len(lobby_manager.members(2)) > 1:
             emit ('receiveChat', lobby_manager.updateChat('System', 'The next game will start in {}'.format(sec)), broadcast = True)
             sec -= 1
             sleep(1)
@@ -135,14 +135,18 @@ def nextC(data):
         if lobby_manager.correct(data[0], data[1]) and (data[0] != gameInfoCol.find()[0]["drawer"]) and (stat == 2) and lobby_manager.winner == False and len(lobby_manager.members(2)) > 1:
             usersCol.update({"email": data[0]}, {
                 "$inc": {
-                    "points": 1
+                    "points": 75
                 }
             })
-
+            usersCol.update({"email": gameInfoCol.find()[0]["drawer"]}, {
+                "$inc": {
+                    "points": 100
+                }
+            })
             lobby_manager.winner = True
             lobby_manager.newRound()
             emit('receiveChat', lobby_manager.updateChat('System', data[0] + ' has found the answer of "' + gameInfoCol.find()[0]["word"] + '"!'), broadcast = True)
-            while sec > -1 and len(lobby_manager.members(2)) > 1:
+            while sec > 0 and len(lobby_manager.members(2)) > 1:
                 emit ('receiveChat', lobby_manager.updateChat('System', 'The next game will start in {}'.format(sec)), broadcast = True)
                 sec -= 1
                 sleep(1)
@@ -177,14 +181,15 @@ def nextC(data):
 def save(data):
     email = data[1]
     img = data[0]
-    if imageCol.find({"email": email}).count() > 0:
-        imageCol.update({"email": email}, {
-            "$push": {"images": img
-                        }
-        })
-    else:
-        image_data = {"email": email, "images": [img]}
-        imageCol.insert_one(image_data)
+    if len(gameInfoCol.find()[0]["word"]) > 1:
+        if imageCol.find({"email": email}).count() > 0:
+            imageCol.update({"email": email}, {
+                "$push": {"images": [img, gameInfoCol.find()[0]["word"]]
+                }
+            })
+        else:
+            image_data = {"email": email, "images": [[img, gameInfoCol.find()[0]["word"]]]}
+            imageCol.insert_one(image_data)
 
 @socketIo.on('getImage')
 def get(data):
@@ -193,31 +198,32 @@ def get(data):
         res = imageCol.find({"email": data})
         for m in res:
             for i in m["images"]:
-                images.append(i)
+                if len(i[1]) > 1:
+                    #i[0] == img, i[1] == word
+                    images.append([i[0], i[1]])
         emit("displayImage", images, broadcast = False)
 
 @socketIo.on('deleteImage')
 def delete(data):
-    #image, email
+    #image, email, title
     img = data[0]
     email = data[1]
+    title = data[2]
     needInsert = 0
     cur = imageCol.find({'email': email})
     for i in cur:
         for p in i["images"]:
-            if p == img:
+            if p[0] == img:
                 needInsert += 1
-                lobby_manager.tester += 1
     imageCol.update({"email": email}, {
         '$pull': {
-            "images": img
+            "images": [img, title]
         }
     })
     if needInsert > 0:
         for m in range(needInsert - 1):
-            lobby_manager.tester_2 += 1
             imageCol.update({"email": email}, {
-                "$push": {"images": img
+                "$push": {"images": [img, title]
                 }
             })
 
@@ -277,7 +283,7 @@ def u_info():
                 p.append([m["email"], "Status: " + str(m["status"])])
             except:
                 p.append("EXCEPTED but WORKS")
-    package = {"Users": p, "tester": lobby_manager.tester, "tester2": lobby_manager.tester_2}
+    package = {"Users": p, "tester": lobby_manager.tester}
     return package
 
 

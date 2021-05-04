@@ -114,11 +114,11 @@ class BoardDrawer extends React.Component {
                     </div>
                     <h1>Colors:</h1>
                     <div className = 'colorContainer'>
-                        <button value = '#000000' className = 'pickerBTN' onClick = { (e) => this.colorChange(e)} style = {{backgroundColor: "black"}}></button>
-                        <button value = '#FF0000' className = 'pickerBTN' onClick = { (e) => this.colorChange(e)} style = {{backgroundColor: "red"}}></button>
-                        <button value = '#000cff' className = 'pickerBTN' onClick = { (e) => this.colorChange(e)} style = {{backgroundColor: "blue"}}></button>
-                        <button value = '#00ff1b' className = 'pickerBTN' onClick = { (e) => this.colorChange(e)} style = {{backgroundColor: "green"}}></button>
-                        <button value = '#fffb00' className = 'pickerBTN' onClick = { (e) => this.colorChange(e)} style = {{backgroundColor: "yellow"}}></button>
+                        <button value = '#000000' className = 'pickerBTNC' onClick = { (e) => this.colorChange(e)} style = {{backgroundColor: "black"}}></button>
+                        <button value = '#FF0000' className = 'pickerBTNC' onClick = { (e) => this.colorChange(e)} style = {{backgroundColor: "red"}}></button>
+                        <button value = '#000cff' className = 'pickerBTNC' onClick = { (e) => this.colorChange(e)} style = {{backgroundColor: "blue"}}></button>
+                        <button value = '#00ff1b' className = 'pickerBTNC' onClick = { (e) => this.colorChange(e)} style = {{backgroundColor: "green"}}></button>
+                        <button value = '#fffb00' className = 'pickerBTNC' onClick = { (e) => this.colorChange(e)} style = {{backgroundColor: "yellow"}}></button>
                     </div>
                 </div>
 
