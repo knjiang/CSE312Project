@@ -20,7 +20,7 @@ light_collection = db['light_mode']
 
 @app.route('/api/')
 def homepage():
-    return redirect("http://localhost:3000")
+    return redirect("http://frontend-app:3000")
 
 @socketIo.on('logged')
 def handleLogin(info):
